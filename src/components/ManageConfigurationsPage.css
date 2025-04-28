@@ -1,0 +1,101 @@
+.manage-config-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    min-height: 100vh;
+    text-align: center;
+    background-color: #1e1e1e;
+    color: white;
+    height: 100vh;          /* Tüm ekran yüksekliği kadar alan aç */
+    overflow-y: auto;       /* Eğer içerik taşarsa dikey scroll aktif et */
+    padding: 2rem;          /* İçeriden biraz boşluk ver */
+    box-sizing: border-box; /* Padding dışına taşmasın */
+
+  }
+  
+  .form-group {
+    margin-bottom: 1rem;
+    width: 300px;
+    text-align: left;
+  }
+  
+  .form-group label {
+    font-weight: bold;
+  }
+  
+  .form-group input {
+    width: 100%;
+    padding: 8px;
+    border-radius: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+  }
+  
+  .button-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .button-row button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #222;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .button-row button:hover {
+    background-color: #444;
+  }
+  
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  li {
+    margin-bottom: 1rem;
+  }
+  
+  .delete-button {
+    margin-left: 10px;
+    padding: 5px 10px;
+    background-color: #d11a2a;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .delete-button:hover {
+    background-color: #a30e1a;
+  }
+  .search-bar {
+    margin-bottom: 1rem;
+  }
+  
+  .search-bar input {
+    width: 300px;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+  .edit-button {
+    margin-right: 8px;
+    padding: 5px 10px;
+    background-color: #130227; /* yeşil gibi bir renk */
+    border: none;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .edit-button:hover {
+    background-color: #3e0c6c;
+  }
+  

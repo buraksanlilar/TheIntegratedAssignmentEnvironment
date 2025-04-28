@@ -1,0 +1,30 @@
+.home-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* EKLENDİ: Dikey ortalama */
+  min-height: 100vh;        /* EKLENDİ: Tüm ekranı kaplasın */
+  padding: 2rem;
+  text-align: center;       /* EKLENDİ: Yazı ortalansın */
+  box-sizing: border-box;
+}
+
+.button-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 200px);
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.button-grid button {
+  padding: 0.75rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+/* EKLENDİ: Başlığı büyütelim sadece */
+.home-container h1 {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+}
