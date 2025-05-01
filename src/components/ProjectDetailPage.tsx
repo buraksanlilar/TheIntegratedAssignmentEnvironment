@@ -5,45 +5,31 @@ const ProjectDetailPage: React.FC = () => {
   const { projectName } = useParams();
   const navigate = useNavigate();
   const [project, setProject] = useState<any>(null);
-  const [studentFolders, setStudentFolders] = useState<string[]>([]);
   const [results, setResults] = useState<any[]>([]);
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("projects") || "[]");
-    const found = stored.find((p: any) => p.projectName === projectName);
+    const found = stored.find((p: any) => p.name === projectName);
     if (found) {
       setProject(found);
       setResults(found.results || []);
-
-      // 📁 Öğrenci klasörlerini doğrudan proje klasöründen oku
-      try {
-        const fs = window.require("fs");
-        const path = window.require("path");
-        const folders = fs
-          .readdirSync(found.path)
-          .filter((f: string) => {
-            const fullPath = path.join(found.path, f);
-            return fs.statSync(fullPath).isDirectory();
-          });
-        setStudentFolders(folders);
-      } catch (err) {
-        console.error("Failed to read project directory:", err);
-      }
     }
   }, [projectName]);
 
   const handleEvaluate = () => {
-    const newResults = studentFolders.map((id) => ({
+    if (!project || !project.students) return;
+
+    const newResults = Object.keys(project.students).map((id) => ({
       studentId: id,
-      status: Math.random() < 0.5 ? "Success" : "Failure", // Sahte sonuç
+      status: Math.random() < 0.5 ? "Success" : "Failure", // sahte değerlendirme
     }));
 
     setResults(newResults);
 
-    // localStorage'daki projeyi güncelle
+    // localStorage'ı güncelle
     const allProjects = JSON.parse(localStorage.getItem("projects") || "[]");
     const updatedProjects = allProjects.map((p: any) =>
-      p.projectName === projectName ? { ...p, results: newResults } : p
+      p.name === projectName ? { ...p, results: newResults } : p
     );
     localStorage.setItem("projects", JSON.stringify(updatedProjects));
   };
@@ -57,17 +43,16 @@ const ProjectDetailPage: React.FC = () => {
 
   return (
     <div className="create-project-container">
-      <h2>Project: {project.projectName}</h2>
+      <h2>Project: {project.name}</h2>
       <p><strong>Created:</strong> {new Date(project.createdAt).toLocaleString()}</p>
-      <p><strong>Configuration:</strong> {project.configuration?.configName}</p>
-      <p><strong>Project Path:</strong> {project.path}</p>
+      <p><strong>Configuration:</strong> {project.config?.configName}</p>
 
       <h3 style={{ marginTop: "2rem" }}>Student Submissions</h3>
-      {studentFolders.length === 0 ? (
+      {Object.keys(project.students || {}).length === 0 ? (
         <p>No student folders found.</p>
       ) : (
         <ul style={{ listStyle: "none", padding: 0 }}>
-          {studentFolders.map((id) => (
+          {Object.keys(project.students).map((id) => (
             <li
               key={id}
               style={{
