@@ -80,7 +80,7 @@ ipcMain.handle('select-zip-folder', async () => {
   }
 })
 
-// ✅ ZIP klasörünü işleyip her ZIP'i isimli klasöre extract eden handler
+// ✅ ZIP klasörünü işleyip her ZIP'i klasöre extract eden handler
 ipcMain.handle('process-zip-folder', async (_event, zipFolderPath: string, projectName: string) => {
   try {
     const projectRoot = path.join(PROJECTS_DIR, projectName)
@@ -90,10 +90,11 @@ ipcMain.handle('process-zip-folder', async (_event, zipFolderPath: string, proje
     }
 
     const zipFiles = fs.readdirSync(zipFolderPath).filter(f => f.endsWith('.zip'))
+    const extractedStudents: { studentId: string; path: string }[] = []
 
     for (const zipFile of zipFiles) {
       const zipPath = path.join(zipFolderPath, zipFile)
-      const folderName = path.basename(zipFile, '.zip')
+      const folderName = path.basename(zipFile, '.zip') // studentId
       const targetFolder = path.join(projectRoot, folderName)
 
       if (!fs.existsSync(targetFolder)) {
@@ -101,9 +102,14 @@ ipcMain.handle('process-zip-folder', async (_event, zipFolderPath: string, proje
       }
 
       await extract(zipPath, { dir: targetFolder })
+
+      extractedStudents.push({
+        studentId: folderName,
+        path: targetFolder
+      })
     }
 
-    return { success: true }
+    return { success: true, students: extractedStudents }
   } catch (error: any) {
     console.error("ZIP processing failed:", error)
     return { success: false, error: error.message }

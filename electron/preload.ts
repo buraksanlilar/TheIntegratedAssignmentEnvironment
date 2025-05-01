@@ -27,18 +27,16 @@ contextBridge.exposeInMainWorld('api', {
   openHelp: () => ipcRenderer.invoke('open-help'),
 
   // ZIP işlemleri
-  selectZipFile: () => ipcRenderer.invoke('select-zip'),                    // Tek ZIP seçimi
-  selectZipFiles: () => ipcRenderer.invoke('select-multiple-zips'),         // Çoklu ZIP seçimi
-  selectZipFolder: () => ipcRenderer.invoke('select-zip-folder'),           // ZIP klasörü seçimi
+  selectZipFile: () => ipcRenderer.invoke('select-zip'),
+  selectZipFiles: () => ipcRenderer.invoke('select-multiple-zips'),
+  selectZipFolder: () => ipcRenderer.invoke('select-zip-folder'),
   importZip: () => ipcRenderer.invoke('import-zip'),
   importZipToProject: (zipPath: string, projectPath: string) =>
     ipcRenderer.invoke('import-zip-to-project', zipPath, projectPath),
-
-  // 📁 ZIP klasörünü okuyup sadece .zip dosyalarını listele
   listZipFilesInFolder: (folderPath: string) =>
     ipcRenderer.invoke('list-zip-files', folderPath),
 
-  // 📂 ZIP klasörünü işleyip proje klasörüne extract eden özel fonksiyon
+  // ZIP klasörü işle ve öğrenci ID + yol bilgilerini döndür
   processZipFolder: (zipFolderPath: string, projectName: string) =>
     ipcRenderer.invoke('process-zip-folder', zipFolderPath, projectName),
 })

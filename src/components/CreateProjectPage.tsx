@@ -20,8 +20,16 @@ const CreateProjectPage: React.FC = () => {
   }, []);
 
   const handleCreate = async () => {
-    if (!projectName) {
-      alert("Please enter a project name!");
+    if (!projectName || !selectedConfigName) {
+      alert("Please fill in all fields!");
+      return;
+    }
+
+    const selectedConfig = configurations.find(
+      (config) => config.configName === selectedConfigName
+    );
+    if (!selectedConfig) {
+      alert("Selected configuration not found!");
       return;
     }
 
@@ -29,13 +37,31 @@ const CreateProjectPage: React.FC = () => {
       const result = await window.api.createProject(projectName);
 
       if (result.success) {
+        let students: Record<string, string> = {};
+
         if (zipFolderPath) {
           const processResult = await window.api.processZipFolder(zipFolderPath, projectName);
+
           if (!processResult.success) {
             alert(`ZIP extract failed: ${processResult.error}`);
             return;
           }
+
+          for (const entry of processResult.students) {
+            students[entry.studentId] = entry.path;
+          }
         }
+
+        const existingProjects = JSON.parse(localStorage.getItem("projects") || "[]");
+        const newProject = {
+          name: projectName,
+          config: selectedConfig,
+          students: students,
+          createdAt: new Date().toISOString() // 👈 Oluşturulma zamanı burada
+        };
+        
+
+        localStorage.setItem("projects", JSON.stringify([...existingProjects, newProject]));
 
         alert("Project created successfully!");
         navigate("/");

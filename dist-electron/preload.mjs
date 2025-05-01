@@ -25,15 +25,11 @@ electron.contextBridge.exposeInMainWorld("api", {
   openHelp: () => electron.ipcRenderer.invoke("open-help"),
   // ZIP işlemleri
   selectZipFile: () => electron.ipcRenderer.invoke("select-zip"),
-  // Tek ZIP seçimi
   selectZipFiles: () => electron.ipcRenderer.invoke("select-multiple-zips"),
-  // Çoklu ZIP seçimi
   selectZipFolder: () => electron.ipcRenderer.invoke("select-zip-folder"),
-  // ZIP klasörü seçimi
   importZip: () => electron.ipcRenderer.invoke("import-zip"),
   importZipToProject: (zipPath, projectPath) => electron.ipcRenderer.invoke("import-zip-to-project", zipPath, projectPath),
-  // 📁 ZIP klasörünü okuyup sadece .zip dosyalarını listele
   listZipFilesInFolder: (folderPath) => electron.ipcRenderer.invoke("list-zip-files", folderPath),
-  // 📂 ZIP klasörünü işleyip proje klasörüne extract eden özel fonksiyon
+  // ZIP klasörü işle ve öğrenci ID + yol bilgilerini döndür
   processZipFolder: (zipFolderPath, projectName) => electron.ipcRenderer.invoke("process-zip-folder", zipFolderPath, projectName)
 });

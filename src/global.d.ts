@@ -15,13 +15,11 @@ declare global {
       selectZipFiles: () => Promise<{ success: boolean; paths?: string[] }>
       selectZipFolder: () => Promise<{ success: boolean; folderPath?: string }>
       importZipToProject: (zipPath: string, projectPath: string) => Promise<{ success: boolean; error?: string }>
-
-      // 📁 Klasördeki ZIP dosyalarını listele (context isolation çözümü)
       listZipFilesInFolder: (folderPath: string) => Promise<string[]>
+      processZipFolder: (zipFolderPath: string, projectName: string) => Promise<{
+        students: any; success: boolean; error?: string 
+}>
 
-      // 📂 ZIP klasörünü işleyip proje klasörüne extract eden özel fonksiyon
-      processZipFolder: (zipFolderPath: string, projectName: string) => Promise<{ success: boolean; error?: string }>
-      
     }
   }
 }

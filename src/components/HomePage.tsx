@@ -10,8 +10,9 @@ const HomePage: React.FC = () => {
   }
 
   const handleOpenProject = () => {
-    window.api.openProject()
+    navigate('/open') // Eskiden window.api.openProject çağrıyordu
   }
+  
 
   const handleManageConfigs = () => {
     navigate('/manage-configurations')

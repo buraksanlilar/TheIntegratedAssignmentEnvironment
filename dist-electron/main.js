@@ -2497,6 +2497,7 @@ ipcMain.handle("process-zip-folder", async (_event, zipFolderPath, projectName) 
       fs$4.mkdirSync(projectRoot, { recursive: true });
     }
     const zipFiles = fs$4.readdirSync(zipFolderPath).filter((f) => f.endsWith(".zip"));
+    const extractedStudents = [];
     for (const zipFile of zipFiles) {
       const zipPath = path$1.join(zipFolderPath, zipFile);
       const folderName = path$1.basename(zipFile, ".zip");
@@ -2505,8 +2506,12 @@ ipcMain.handle("process-zip-folder", async (_event, zipFolderPath, projectName) 
         fs$4.mkdirSync(targetFolder, { recursive: true });
       }
       await extract(zipPath, { dir: targetFolder });
+      extractedStudents.push({
+        studentId: folderName,
+        path: targetFolder
+      });
     }
-    return { success: true };
+    return { success: true, students: extractedStudents };
   } catch (error) {
     console.error("ZIP processing failed:", error);
     return { success: false, error: error.message };
