@@ -20,12 +20,25 @@ contextBridge.exposeInMainWorld('api', {
     return ipcRenderer.invoke(channel, ...omit)
   },
 
-  // specified methods
+  // Özel fonksiyonlar
   createProject: (name: string) => ipcRenderer.invoke('create-project', name),
   openProject: () => ipcRenderer.invoke('open-project'),
   manageConfigurations: () => ipcRenderer.invoke('manage-configurations'),
   openHelp: () => ipcRenderer.invoke('open-help'),
-  selectZipFile: () => ipcRenderer.invoke('select-zip'),
+
+  // ZIP işlemleri
+  selectZipFile: () => ipcRenderer.invoke('select-zip'),                    // Tek ZIP seçimi
+  selectZipFiles: () => ipcRenderer.invoke('select-multiple-zips'),         // Çoklu ZIP seçimi
+  selectZipFolder: () => ipcRenderer.invoke('select-zip-folder'),           // ZIP klasörü seçimi
   importZip: () => ipcRenderer.invoke('import-zip'),
-  importZipToProject: (zipPath: string, projectPath: string) => ipcRenderer.invoke('import-zip-to-project', zipPath, projectPath),
+  importZipToProject: (zipPath: string, projectPath: string) =>
+    ipcRenderer.invoke('import-zip-to-project', zipPath, projectPath),
+
+  // 📁 ZIP klasörünü okuyup sadece .zip dosyalarını listele
+  listZipFilesInFolder: (folderPath: string) =>
+    ipcRenderer.invoke('list-zip-files', folderPath),
+
+  // 📂 ZIP klasörünü işleyip proje klasörüne extract eden özel fonksiyon
+  processZipFolder: (zipFolderPath: string, projectName: string) =>
+    ipcRenderer.invoke('process-zip-folder', zipFolderPath, projectName),
 })

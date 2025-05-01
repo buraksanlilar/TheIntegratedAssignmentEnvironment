@@ -1,117 +1,101 @@
-import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import './CreateProjectPage.css'
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import "./CreateProjectPage.css";
 
 const CreateProjectPage: React.FC = () => {
-  const [projectName, setProjectName] = useState('')
-  const [selectedConfigName, setSelectedConfigName] = useState('')
-  const [configurations, setConfigurations] = useState<any[]>([])
-  const [zipPath, setZipPath] = useState<string | null>(null)
-  const navigate = useNavigate()
-  const [showModal, setShowModal] = useState(false)
-  const [editConfigName, setEditConfigName] = useState('')
-  const [editLanguage, setEditLanguage] = useState('')
-  const [editInputFormat, setEditInputFormat] = useState('')
-  const [editOutputFormat, setEditOutputFormat] = useState('')
+  const [projectName, setProjectName] = useState("");
+  const [selectedConfigName, setSelectedConfigName] = useState("");
+  const [configurations, setConfigurations] = useState<any[]>([]);
+  const [zipFolderPath, setZipFolderPath] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
+  const [editConfigName, setEditConfigName] = useState("");
+  const [editLanguage, setEditLanguage] = useState("");
+  const [editInputFormat, setEditInputFormat] = useState("");
+  const [editOutputFormat, setEditOutputFormat] = useState("");
 
   useEffect(() => {
-    const storedConfigs = JSON.parse(localStorage.getItem('configurations') || '[]')
-    setConfigurations(storedConfigs)
-  }, [])
+    const storedConfigs = JSON.parse(localStorage.getItem("configurations") || "[]");
+    setConfigurations(storedConfigs);
+  }, []);
 
   const handleCreate = async () => {
-    if (!projectName || !selectedConfigName) {
-      alert('Please fill in all fields!')
-      return
+    if (!projectName) {
+      alert("Please enter a project name!");
+      return;
     }
-  
-    const selectedConfig = configurations.find(config => config.configName === selectedConfigName)
-    if (!selectedConfig) {
-      alert('Selected configuration not found!')
-      return
-    }
-  
+
     try {
-      // 👇 projectName parametresi burada geçiliyor!
-      const result: { success: boolean; project?: any; path?: string; error?: string } = await window.api.createProject(projectName)
-  
+      const result = await window.api.createProject(projectName);
+
       if (result.success) {
-        if (zipPath && result.path) {
-          const zipResult = await window.api.importZipToProject(zipPath, result.path)
-          if (!zipResult.success) {
-            alert('ZIP extract failed.')
-            return
+        if (zipFolderPath) {
+          const processResult = await window.api.processZipFolder(zipFolderPath, projectName);
+          if (!processResult.success) {
+            alert(`ZIP extract failed: ${processResult.error}`);
+            return;
           }
         }
-  
-        const newProject = {
-          projectName,
-          configuration: selectedConfig,
-          createdAt: new Date().toISOString(),
-          students: [],
-          results: [],
-          path: result.path || ''
-        }
-  
-        const existingProjects = JSON.parse(localStorage.getItem('projects') || '[]')
-        existingProjects.push(newProject)
-        localStorage.setItem('projects', JSON.stringify(existingProjects))
-  
-        alert('Project created successfully!')
-        navigate('/')
+
+        alert("Project created successfully!");
+        navigate("/");
       } else {
-        alert(`Failed to create project. ${result.error || ''}`)
+        alert(`Failed to create project. ${result.error || ""}`);
       }
     } catch (error) {
-      console.error('Error creating project:', error)
-      alert('An unexpected error occurred.')
+      console.error("Error creating project:", error);
+      alert("An unexpected error occurred.");
     }
-  }
-  
+  };
+
   const handleCancel = () => {
-    navigate('/')
-  }
+    navigate("/");
+  };
 
   const handleOpenModal = () => {
     if (!selectedConfigName) {
-      alert('Please select a configuration to edit!')
-      return
+      alert("Please select a configuration to edit!");
+      return;
     }
 
-    const config = configurations.find(c => c.configName === selectedConfigName)
-    if (!config) return
+    const config = configurations.find(
+      (c) => c.configName === selectedConfigName
+    );
+    if (!config) return;
 
-    setEditConfigName(config.configName)
-    setEditLanguage(config.language)
-    setEditInputFormat(config.inputFormat)
-    setEditOutputFormat(config.outputFormat)
-    setShowModal(true)
-  }
+    setEditConfigName(config.configName);
+    setEditLanguage(config.language);
+    setEditInputFormat(config.inputFormat);
+    setEditOutputFormat(config.outputFormat);
+    setShowModal(true);
+  };
 
   const handleCloseModal = () => {
-    setShowModal(false)
-  }
+    setShowModal(false);
+  };
 
   const handleSaveEdit = () => {
-    const updatedConfigs = configurations.map(config => {
+    const updatedConfigs = configurations.map((config) => {
       if (config.configName === selectedConfigName) {
         return {
           configName: editConfigName,
           language: editLanguage,
           inputFormat: editInputFormat,
-          outputFormat: editOutputFormat
-        }
+          outputFormat: editOutputFormat,
+        };
       }
-      return config
-    })
+      return config;
+    });
 
-    setConfigurations(updatedConfigs)
-    localStorage.setItem('configurations', JSON.stringify(updatedConfigs))
-    setSelectedConfigName(editConfigName)
-    setShowModal(false)
-  }
+    setConfigurations(updatedConfigs);
+    localStorage.setItem("configurations", JSON.stringify(updatedConfigs));
+    setSelectedConfigName(editConfigName);
+    setShowModal(false);
+  };
 
-  const selectedConfig = configurations.find(config => config.configName === selectedConfigName)
+  const selectedConfig = configurations.find(
+    (config) => config.configName === selectedConfigName
+  );
 
   return (
     <div className="create-project-container">
@@ -152,14 +136,21 @@ const CreateProjectPage: React.FC = () => {
       )}
 
       <div className="form-group">
-        <label>Student Submissions (ZIP):</label>
-        <button onClick={async () => {
-          const result = await window.api.selectZipFile()
-          if (result.success) {
-            setZipPath(result.path?? '')
-          }
-        }}>Select ZIP File</button>
-        {zipPath && <p style={{ fontSize: '0.9rem' }}>{zipPath}</p>}
+        <label>Student Submissions Folder:</label>
+        <button
+          onClick={async () => {
+            const result = await window.api.selectZipFolder();
+            if (result.success && result.folderPath) {
+              setZipFolderPath(result.folderPath);
+            }
+          }}
+        >
+          Select ZIP Folder
+        </button>
+
+        {zipFolderPath && (
+          <p style={{ fontSize: "0.9rem", marginTop: "10px" }}>{zipFolderPath}</p>
+        )}
       </div>
 
       <div className="button-row">
@@ -221,7 +212,7 @@ const CreateProjectPage: React.FC = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default CreateProjectPage
+export default CreateProjectPage;

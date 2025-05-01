@@ -2465,21 +2465,9 @@ if (!fs$4.existsSync(PROJECTS_DIR)) {
 }
 ipcMain.handle("create-project", async (_event, projectName) => {
   try {
-    const result = await dialog.showOpenDialog({
-      title: "Select location to create your project folder",
-      properties: ["openDirectory"]
-    });
-    if (result.canceled || result.filePaths.length === 0) {
-      return { success: false, error: "No directory selected" };
-    }
-    const basePath = result.filePaths[0];
-    const projectPath = path$1.join(basePath, projectName);
-    const submissionsPath = path$1.join(projectPath, "submissions");
+    const projectPath = path$1.join(PROJECTS_DIR, projectName);
     if (!fs$4.existsSync(projectPath)) {
-      fs$4.mkdirSync(projectPath);
-    }
-    if (!fs$4.existsSync(submissionsPath)) {
-      fs$4.mkdirSync(submissionsPath);
+      fs$4.mkdirSync(projectPath, { recursive: true });
     }
     return { success: true, path: projectPath };
   } catch (error) {
@@ -2487,54 +2475,40 @@ ipcMain.handle("create-project", async (_event, projectName) => {
     return { success: false, error: error.message };
   }
 });
-ipcMain.handle("select-zip", async () => {
+ipcMain.handle("select-zip-folder", async () => {
   try {
     const result = await dialog.showOpenDialog({
-      title: "Select ZIP File",
-      properties: ["openFile"],
-      filters: [{ name: "ZIP Files", extensions: ["zip"] }]
+      title: "Select Folder Containing ZIPs",
+      properties: ["openDirectory"]
     });
     if (result.canceled || result.filePaths.length === 0) {
       return { success: false };
     }
-    return { success: true, path: result.filePaths[0] };
+    return { success: true, folderPath: result.filePaths[0] };
   } catch (error) {
-    console.error("Error selecting ZIP file:", error);
+    console.error("Error selecting ZIP folder:", error);
     return { success: false, error: error.message };
   }
 });
-ipcMain.handle("import-zip", async () => {
+ipcMain.handle("process-zip-folder", async (_event, zipFolderPath, projectName) => {
   try {
-    const result = await dialog.showOpenDialog({
-      title: "Select ZIP file",
-      filters: [{ name: "ZIP Files", extensions: ["zip"] }],
-      properties: ["openFile"]
-    });
-    if (result.canceled || result.filePaths.length === 0) {
-      return { success: false, error: "No file selected" };
+    const projectRoot = path$1.join(PROJECTS_DIR, projectName);
+    if (!fs$4.existsSync(projectRoot)) {
+      fs$4.mkdirSync(projectRoot, { recursive: true });
     }
-    const zipPath = result.filePaths[0];
-    const submissionsDir = path$1.join(process.env.APP_ROOT || "", "submissions");
-    if (!fs$4.existsSync(submissionsDir)) {
-      fs$4.mkdirSync(submissionsDir, { recursive: true });
+    const zipFiles = fs$4.readdirSync(zipFolderPath).filter((f) => f.endsWith(".zip"));
+    for (const zipFile of zipFiles) {
+      const zipPath = path$1.join(zipFolderPath, zipFile);
+      const folderName = path$1.basename(zipFile, ".zip");
+      const targetFolder = path$1.join(projectRoot, folderName);
+      if (!fs$4.existsSync(targetFolder)) {
+        fs$4.mkdirSync(targetFolder, { recursive: true });
+      }
+      await extract(zipPath, { dir: targetFolder });
     }
-    await extract(zipPath, { dir: submissionsDir });
-    return { success: true, path: submissionsDir };
-  } catch (error) {
-    console.error("ZIP extract error:", error);
-    return { success: false, error: error.message };
-  }
-});
-ipcMain.handle("import-zip-to-project", async (_event, zipPath, projectPath) => {
-  try {
-    const submissionsPath = path$1.join(projectPath, "submissions");
-    if (!fs$4.existsSync(submissionsPath)) {
-      fs$4.mkdirSync(submissionsPath, { recursive: true });
-    }
-    await extract(zipPath, { dir: submissionsPath });
     return { success: true };
   } catch (error) {
-    console.error("Failed to import zip to project:", error);
+    console.error("ZIP processing failed:", error);
     return { success: false, error: error.message };
   }
 });

@@ -3,9 +3,7 @@ import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import fs from 'fs'
-
 import extract from 'extract-zip'
-
 
 const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -16,7 +14,9 @@ export const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
 export const MAIN_DIST = path.join(process.env.APP_ROOT, 'dist-electron')
 export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist')
 
-process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 'public') : RENDERER_DIST
+process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
+  ? path.join(process.env.APP_ROOT, 'public')
+  : RENDERER_DIST
 
 let win: BrowserWindow | null
 
@@ -41,106 +41,76 @@ function createWindow() {
 
 // 📁 Projects ana klasörü
 const PROJECTS_DIR = path.join(process.env.APP_ROOT || '', 'projects')
-
-// Klasör yoksa oluştur
 if (!fs.existsSync(PROJECTS_DIR)) {
   fs.mkdirSync(PROJECTS_DIR)
 }
 
-// IPC Handlers
-
-// ✅ Proje klasörü oluştur
+// ✅ Proje oluşturma
 ipcMain.handle('create-project', async (_event, projectName: string) => {
   try {
-    const result = await dialog.showOpenDialog({
-      title: 'Select location to create your project folder',
-      properties: ['openDirectory']
-    });
-
-    if (result.canceled || result.filePaths.length === 0) {
-      return { success: false, error: 'No directory selected' };
-    }
-
-    const basePath = result.filePaths[0];
-    const projectPath = path.join(basePath, projectName);
-    const submissionsPath = path.join(projectPath, 'submissions');
+    const projectPath = path.join(PROJECTS_DIR, projectName)
 
     if (!fs.existsSync(projectPath)) {
-      fs.mkdirSync(projectPath);
-    }
-    if (!fs.existsSync(submissionsPath)) {
-      fs.mkdirSync(submissionsPath);
+      fs.mkdirSync(projectPath, { recursive: true })
     }
 
-    return { success: true, path: projectPath };
+    return { success: true, path: projectPath }
   } catch (error: any) {
-    console.error('Error creating project folder:', error);
-    return { success: false, error: error.message };
+    console.error('Error creating project folder:', error)
+    return { success: false, error: error.message }
   }
-});
+})
 
-ipcMain.handle('select-zip', async () => {
+// ✅ ZIP klasörü seçimi
+ipcMain.handle('select-zip-folder', async () => {
   try {
     const result = await dialog.showOpenDialog({
-      title: 'Select ZIP File',
-      properties: ['openFile'],
-      filters: [{ name: 'ZIP Files', extensions: ['zip'] }]
+      title: 'Select Folder Containing ZIPs',
+      properties: ['openDirectory']
     })
 
     if (result.canceled || result.filePaths.length === 0) {
       return { success: false }
     }
 
-    return { success: true, path: result.filePaths[0] }
+    return { success: true, folderPath: result.filePaths[0] }
   } catch (error: any) {
-    console.error('Error selecting ZIP file:', error)
+    console.error('Error selecting ZIP folder:', error)
     return { success: false, error: error.message }
   }
 })
 
-ipcMain.handle('import-zip', async () => {
+// ✅ ZIP klasörünü işleyip her ZIP'i isimli klasöre extract eden handler
+ipcMain.handle('process-zip-folder', async (_event, zipFolderPath: string, projectName: string) => {
   try {
-    const result = await dialog.showOpenDialog({
-      title: 'Select ZIP file',
-      filters: [{ name: 'ZIP Files', extensions: ['zip'] }],
-      properties: ['openFile']
-    });
+    const projectRoot = path.join(PROJECTS_DIR, projectName)
 
-    if (result.canceled || result.filePaths.length === 0) {
-      return { success: false, error: 'No file selected' };
+    if (!fs.existsSync(projectRoot)) {
+      fs.mkdirSync(projectRoot, { recursive: true })
     }
 
-    const zipPath = result.filePaths[0];
-    const submissionsDir = path.join(process.env.APP_ROOT || '', 'submissions');
+    const zipFiles = fs.readdirSync(zipFolderPath).filter(f => f.endsWith('.zip'))
 
-    if (!fs.existsSync(submissionsDir)) {
-      fs.mkdirSync(submissionsDir, { recursive: true });
+    for (const zipFile of zipFiles) {
+      const zipPath = path.join(zipFolderPath, zipFile)
+      const folderName = path.basename(zipFile, '.zip')
+      const targetFolder = path.join(projectRoot, folderName)
+
+      if (!fs.existsSync(targetFolder)) {
+        fs.mkdirSync(targetFolder, { recursive: true })
+      }
+
+      await extract(zipPath, { dir: targetFolder })
     }
 
-    await extract(zipPath, { dir: submissionsDir });
-
-    return { success: true, path: submissionsDir };
-  } catch (error: any) {
-    console.error('ZIP extract error:', error);
-    return { success: false, error: error.message };
-  }
-});
-
-ipcMain.handle('import-zip-to-project', async (_event, zipPath: string, projectPath: string) => {
-  try {
-    const submissionsPath = path.join(projectPath, 'submissions')
-    if (!fs.existsSync(submissionsPath)) {
-      fs.mkdirSync(submissionsPath, { recursive: true })
-    }
-    await extract(zipPath, { dir: submissionsPath })
     return { success: true }
   } catch (error: any) {
-    console.error('Failed to import zip to project:', error)
+    console.error("ZIP processing failed:", error)
     return { success: false, error: error.message }
   }
 })
 
-// henüz içi boş
+// Diğer işlemler
 ipcMain.handle('open-project', async () => {
   console.log('Open Project clicked')
 })
@@ -153,8 +123,7 @@ ipcMain.handle('open-help', async () => {
   console.log('Help clicked')
 })
 
-// App lifecycle
-
+// Uygulama lifecycle
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
@@ -167,8 +136,5 @@ app.on('activate', () => {
     createWindow()
   }
 })
-
-
-
 
 app.whenReady().then(createWindow)
