@@ -4,7 +4,10 @@ import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import fs from 'fs'
 import extract from 'extract-zip'
+import { exec } from 'child_process'
+import util from 'util'
 
+const execPromise = util.promisify(exec)
 const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -49,11 +52,9 @@ if (!fs.existsSync(PROJECTS_DIR)) {
 ipcMain.handle('create-project', async (_event, projectName: string) => {
   try {
     const projectPath = path.join(PROJECTS_DIR, projectName)
-
     if (!fs.existsSync(projectPath)) {
       fs.mkdirSync(projectPath, { recursive: true })
     }
-
     return { success: true, path: projectPath }
   } catch (error: any) {
     console.error('Error creating project folder:', error)
@@ -84,7 +85,6 @@ ipcMain.handle('select-zip-folder', async () => {
 ipcMain.handle('process-zip-folder', async (_event, zipFolderPath: string, projectName: string) => {
   try {
     const projectRoot = path.join(PROJECTS_DIR, projectName)
-
     if (!fs.existsSync(projectRoot)) {
       fs.mkdirSync(projectRoot, { recursive: true })
     }
@@ -113,6 +113,56 @@ ipcMain.handle('process-zip-folder', async (_event, zipFolderPath: string, proje
   } catch (error: any) {
     console.error("ZIP processing failed:", error)
     return { success: false, error: error.message }
+  }
+})
+
+// ✅ Evaluate C Projects Only
+ipcMain.handle('evaluate-project', async (_event, project: any) => {
+  try {
+    const results: { studentId: string; status: string; error?: string; actualOutput?: string }[] = []
+
+    const compilerPath = 'gcc'
+    const compileArgs = '-o main main.c'
+    const runArgs = project.config?.inputFormat?.split(' ') || []
+    const expectedOutput = (project.config?.outputFormat || '').trim()
+
+    for (const [studentId, studentPath] of Object.entries(project.students || {})) {
+      try {
+        // Derle
+        const compileCmd = `${compilerPath} ${compileArgs}`
+        await execPromise(compileCmd, { cwd: studentPath as string })
+
+        // Çalıştır
+        
+        const isWindows = process.platform === 'win32'
+const runCmd = isWindows ? `main.exe ${runArgs.join(' ')}` : `./main ${runArgs.join(' ')}`
+const { stdout } = await execPromise(runCmd, {
+  cwd: studentPath as string,
+  timeout: 5000,
+})
+
+
+        const actualOutput = stdout.trim()
+        const isCorrect = actualOutput === expectedOutput
+
+        results.push({
+          studentId,
+          status: isCorrect ? 'Success' : 'Failure',
+          ...(isCorrect ? {} : { actualOutput })
+        })
+      } catch (err: any) {
+        results.push({
+          studentId,
+          status: 'Failure',
+          error: err.message || 'Unknown error'
+        })
+      }
+    }
+
+    return { success: true, results }
+  } catch (err: any) {
+    console.error('Evaluation failed:', err)
+    return { success: false, error: err.message }
   }
 })
 

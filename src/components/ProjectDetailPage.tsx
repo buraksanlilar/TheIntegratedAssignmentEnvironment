@@ -6,6 +6,7 @@ const ProjectDetailPage: React.FC = () => {
   const navigate = useNavigate();
   const [project, setProject] = useState<any>(null);
   const [results, setResults] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("projects") || "[]");
@@ -16,22 +17,31 @@ const ProjectDetailPage: React.FC = () => {
     }
   }, [projectName]);
 
-  const handleEvaluate = () => {
+  const handleEvaluate = async () => {
     if (!project || !project.students) return;
+    setLoading(true);
 
-    const newResults = Object.keys(project.students).map((id) => ({
-      studentId: id,
-      status: Math.random() < 0.5 ? "Success" : "Failure", // sahte değerlendirme
-    }));
+    try {
+      const result = await window.api.evaluateProject(project);
 
-    setResults(newResults);
+      if (result.success) {
+        setResults(result.results);
 
-    // localStorage'ı güncelle
-    const allProjects = JSON.parse(localStorage.getItem("projects") || "[]");
-    const updatedProjects = allProjects.map((p: any) =>
-      p.name === projectName ? { ...p, results: newResults } : p
-    );
-    localStorage.setItem("projects", JSON.stringify(updatedProjects));
+        // localStorage'ı güncelle
+        const allProjects = JSON.parse(localStorage.getItem("projects") || "[]");
+        const updatedProjects = allProjects.map((p: any) =>
+          p.name === project.name ? { ...p, results: result.results } : p
+        );
+        localStorage.setItem("projects", JSON.stringify(updatedProjects));
+      } else {
+        alert(`Evaluation failed: ${result.error}`);
+      }
+    } catch (err: any) {
+      alert("Evaluation crashed.");
+      console.error(err);
+    }
+
+    setLoading(false);
   };
 
   const getStatus = (id: string) => {
@@ -52,30 +62,41 @@ const ProjectDetailPage: React.FC = () => {
         <p>No student folders found.</p>
       ) : (
         <ul style={{ listStyle: "none", padding: 0 }}>
-          {Object.keys(project.students).map((id) => (
-            <li
-              key={id}
-              style={{
-                padding: "0.5rem 1rem",
-                margin: "0.5rem 0",
-                backgroundColor: "#2c2c2c",
-                borderRadius: "8px",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <span>{id}</span>
-              <span style={{ fontWeight: "bold" }}>
-                {getStatus(id)}
-              </span>
-            </li>
-          ))}
-        </ul>
+  {Object.keys(project.students).map((id) => {
+    const result = results.find((r) => r.studentId === id)
+    return (
+      <li
+        key={id}
+        style={{
+          padding: "0.5rem 1rem",
+          margin: "0.5rem 0",
+          backgroundColor: "#2c2c2c",
+          borderRadius: "8px",
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <span>{id}</span>
+          <span style={{ fontWeight: "bold" }}>{result?.status}</span>
+        </div>
+
+        {result?.status === 'Failure' && (
+          <div style={{ marginTop: "0.5rem", fontSize: "0.85rem", color: "#ccc" }}>
+            {result.error && <div>❌ Error: {result.error}</div>}
+            {result.actualOutput && <div>📤 Output: {result.actualOutput}</div>}
+            <div>✅ Expected: {project.config?.outputFormat}</div>
+          </div>
+        )}
+      </li>
+    )
+  })}
+</ul>
+
       )}
 
       <div className="button-row">
-        <button onClick={handleEvaluate}>Evaluate</button>
+        <button onClick={handleEvaluate} disabled={loading}>
+          {loading ? "Evaluating..." : "Evaluate"}
+        </button>
         <button onClick={() => navigate("/")}>Back</button>
       </div>
     </div>

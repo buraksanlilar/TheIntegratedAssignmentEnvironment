@@ -16,10 +16,13 @@ declare global {
       selectZipFolder: () => Promise<{ success: boolean; folderPath?: string }>
       importZipToProject: (zipPath: string, projectPath: string) => Promise<{ success: boolean; error?: string }>
       listZipFilesInFolder: (folderPath: string) => Promise<string[]>
-      processZipFolder: (zipFolderPath: string, projectName: string) => Promise<{
-        students: any; success: boolean; error?: string 
-}>
+      processZipFolder: (
+        zipFolderPath: string,
+        projectName: string
+      ) => Promise<{ students: any; success: boolean; error?: string }>
 
+      // ✅ Eksik olan: değerlendirme
+      evaluateProject: (project: any) => Promise<{ success: boolean; results: any[]; error?: string }>
     }
   }
 }

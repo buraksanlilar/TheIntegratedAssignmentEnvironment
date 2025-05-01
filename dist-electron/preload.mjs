@@ -1,7 +1,6 @@
 "use strict";
 const electron = require("electron");
 electron.contextBridge.exposeInMainWorld("api", {
-  // Genel IPC işlemleri
   on: (...args) => {
     const [channel, listener] = args;
     return electron.ipcRenderer.on(channel, (event, ...args2) => listener(event, ...args2));
@@ -31,5 +30,7 @@ electron.contextBridge.exposeInMainWorld("api", {
   importZipToProject: (zipPath, projectPath) => electron.ipcRenderer.invoke("import-zip-to-project", zipPath, projectPath),
   listZipFilesInFolder: (folderPath) => electron.ipcRenderer.invoke("list-zip-files", folderPath),
   // ZIP klasörü işle ve öğrenci ID + yol bilgilerini döndür
-  processZipFolder: (zipFolderPath, projectName) => electron.ipcRenderer.invoke("process-zip-folder", zipFolderPath, projectName)
+  processZipFolder: (zipFolderPath, projectName) => electron.ipcRenderer.invoke("process-zip-folder", zipFolderPath, projectName),
+  // 🔧 Gerçek değerlendirme (proje nesnesi gönderilir)
+  evaluateProject: (project) => electron.ipcRenderer.invoke("evaluate-project", project)
 });

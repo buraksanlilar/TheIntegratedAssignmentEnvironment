@@ -11,6 +11,7 @@ import require$$6 from "stream";
 import require$$3 from "path";
 import require$$1$2 from "zlib";
 import require$$4 from "events";
+import { exec } from "child_process";
 function getDefaultExportFromCjs(x) {
   return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, "default") ? x["default"] : x;
 }
@@ -2435,6 +2436,7 @@ var extractZip = async function(zipPath, opts) {
   return new Extractor(zipPath, opts).extract();
 };
 const extract = /* @__PURE__ */ getDefaultExportFromCjs(extractZip);
+const execPromise = require$$1$1.promisify(exec);
 createRequire(import.meta.url);
 const __dirname = path$1.dirname(fileURLToPath(import.meta.url));
 process.env.APP_ROOT = path$1.join(__dirname, "..");
@@ -2515,6 +2517,45 @@ ipcMain.handle("process-zip-folder", async (_event, zipFolderPath, projectName) 
   } catch (error) {
     console.error("ZIP processing failed:", error);
     return { success: false, error: error.message };
+  }
+});
+ipcMain.handle("evaluate-project", async (_event, project) => {
+  var _a, _b, _c;
+  try {
+    const results = [];
+    const compilerPath = "gcc";
+    const compileArgs = "-o main main.c";
+    const runArgs = ((_b = (_a = project.config) == null ? void 0 : _a.inputFormat) == null ? void 0 : _b.split(" ")) || [];
+    const expectedOutput = (((_c = project.config) == null ? void 0 : _c.outputFormat) || "").trim();
+    for (const [studentId, studentPath] of Object.entries(project.students || {})) {
+      try {
+        const compileCmd = `${compilerPath} ${compileArgs}`;
+        await execPromise(compileCmd, { cwd: studentPath });
+        const isWindows = process.platform === "win32";
+        const runCmd = isWindows ? `main.exe ${runArgs.join(" ")}` : `./main ${runArgs.join(" ")}`;
+        const { stdout } = await execPromise(runCmd, {
+          cwd: studentPath,
+          timeout: 5e3
+        });
+        const actualOutput = stdout.trim();
+        const isCorrect = actualOutput === expectedOutput;
+        results.push({
+          studentId,
+          status: isCorrect ? "Success" : "Failure",
+          ...isCorrect ? {} : { actualOutput }
+        });
+      } catch (err) {
+        results.push({
+          studentId,
+          status: "Failure",
+          error: err.message || "Unknown error"
+        });
+      }
+    }
+    return { success: true, results };
+  } catch (err) {
+    console.error("Evaluation failed:", err);
+    return { success: false, error: err.message };
   }
 });
 ipcMain.handle("open-project", async () => {

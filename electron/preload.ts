@@ -1,8 +1,6 @@
 import { ipcRenderer, contextBridge } from 'electron'
 
-// Tüm API'yi tek bir yerde expose ediyoruz
 contextBridge.exposeInMainWorld('api', {
-  // Genel IPC işlemleri
   on: (...args: Parameters<typeof ipcRenderer.on>) => {
     const [channel, listener] = args
     return ipcRenderer.on(channel, (event, ...args) => listener(event, ...args))
@@ -39,4 +37,7 @@ contextBridge.exposeInMainWorld('api', {
   // ZIP klasörü işle ve öğrenci ID + yol bilgilerini döndür
   processZipFolder: (zipFolderPath: string, projectName: string) =>
     ipcRenderer.invoke('process-zip-folder', zipFolderPath, projectName),
+
+  // 🔧 Gerçek değerlendirme (proje nesnesi gönderilir)
+  evaluateProject: (project: any) => ipcRenderer.invoke('evaluate-project', project),
 })
