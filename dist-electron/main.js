@@ -2520,19 +2520,29 @@ ipcMain.handle("process-zip-folder", async (_event, zipFolderPath, projectName) 
   }
 });
 ipcMain.handle("evaluate-project", async (_event, project) => {
-  var _a, _b, _c;
+  var _a, _b, _c, _d;
   try {
     const results = [];
-    const compilerPath = "gcc";
-    const compileArgs = "-o main main.c";
-    const runArgs = ((_b = (_a = project.config) == null ? void 0 : _a.inputFormat) == null ? void 0 : _b.split(" ")) || [];
-    const expectedOutput = (((_c = project.config) == null ? void 0 : _c.outputFormat) || "").trim();
+    const language = (((_a = project.config) == null ? void 0 : _a.language) || "").toLowerCase();
+    const inputArgs = ((_c = (_b = project.config) == null ? void 0 : _b.inputFormat) == null ? void 0 : _c.split(" ")) || [];
+    const expectedOutput = (((_d = project.config) == null ? void 0 : _d.outputFormat) || "").trim();
+    const isWindows = process.platform === "win32";
     for (const [studentId, studentPath] of Object.entries(project.students || {})) {
       try {
-        const compileCmd = `${compilerPath} ${compileArgs}`;
-        await execPromise(compileCmd, { cwd: studentPath });
-        const isWindows = process.platform === "win32";
-        const runCmd = isWindows ? `main.exe ${runArgs.join(" ")}` : `./main ${runArgs.join(" ")}`;
+        let compileCmd = "";
+        let runCmd = "";
+        if (language === "c") {
+          compileCmd = isWindows ? `gcc main.c -o main.exe` : `gcc main.c -o main`;
+          runCmd = isWindows ? `main.exe ${inputArgs.join(" ")}` : `./main ${inputArgs.join(" ")}`;
+        } else if (language === "java") {
+          compileCmd = `javac Main.java`;
+          runCmd = `java Main ${inputArgs.join(" ")}`;
+        } else if (language === "python") {
+          runCmd = `python main.py ${inputArgs.join(" ")}`;
+        } else {
+          throw new Error(`Unsupported language: ${language}`);
+        }
+        if (compileCmd) await execPromise(compileCmd, { cwd: studentPath });
         const { stdout } = await execPromise(runCmd, {
           cwd: studentPath,
           timeout: 5e3

@@ -8,7 +8,7 @@ const ManageConfigurationsPage: React.FC = () => {
   const [inputFormat, setInputFormat] = useState('')
   const [outputFormat, setOutputFormat] = useState('')
   const [configurations, setConfigurations] = useState<any[]>([])
-  const [editingIndex, setEditingIndex] = useState<number | null>(null) //  su anda hangi kayıt editleniyor?
+  const [editingIndex, setEditingIndex] = useState<number | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const navigate = useNavigate()
 
@@ -27,19 +27,16 @@ const ManageConfigurationsPage: React.FC = () => {
     let updatedConfigs
 
     if (editingIndex !== null) {
-      // 🔥 Eğer edit modundaysa eski kaydı güncelliyoruz
       updatedConfigs = [...configurations]
       updatedConfigs[editingIndex] = newConfig
-      setEditingIndex(null) // Edit moddan çıkıyoruz
+      setEditingIndex(null)
     } else {
-      // Yeni ekliyorsa
       updatedConfigs = [...configurations, newConfig]
     }
 
     setConfigurations(updatedConfigs)
     localStorage.setItem('configurations', JSON.stringify(updatedConfigs))
 
-    // Alanları temizle
     setConfigName('')
     setLanguage('')
     setInputFormat('')
@@ -52,7 +49,7 @@ const ManageConfigurationsPage: React.FC = () => {
     setLanguage(config.language)
     setInputFormat(config.inputFormat)
     setOutputFormat(config.outputFormat)
-    setEditingIndex(index) // 🔥 Edit moduna geçiyoruz
+    setEditingIndex(index)
   }
 
   const handleDeleteConfiguration = (index: number) => {
@@ -60,7 +57,6 @@ const ManageConfigurationsPage: React.FC = () => {
     setConfigurations(updatedConfigs)
     localStorage.setItem('configurations', JSON.stringify(updatedConfigs))
 
-    // Eğer o anda editliyorsak ve silinen index ise edit moddan çık
     if (editingIndex === index) {
       setEditingIndex(null)
       setConfigName('')
@@ -81,6 +77,7 @@ const ManageConfigurationsPage: React.FC = () => {
   return (
     <div className="manage-config-container">
       <h2>Manage Configurations</h2>
+
       <div className="form-group">
         <label>Configuration Name:</label>
         <input
@@ -92,11 +89,12 @@ const ManageConfigurationsPage: React.FC = () => {
 
       <div className="form-group">
         <label>Language:</label>
-        <input
-          type="text"
-          value={language}
-          onChange={(e) => setLanguage(e.target.value)}
-        />
+        <select value={language} onChange={(e) => setLanguage(e.target.value)}>
+          <option value="">Select Language</option>
+          <option value="C">C</option>
+          <option value="Java">Java</option>
+          <option value="Python">Python</option>
+        </select>
       </div>
 
       <div className="form-group">

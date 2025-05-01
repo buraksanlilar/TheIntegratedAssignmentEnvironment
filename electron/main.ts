@@ -121,26 +121,34 @@ ipcMain.handle('evaluate-project', async (_event, project: any) => {
   try {
     const results: { studentId: string; status: string; error?: string; actualOutput?: string }[] = []
 
-    const compilerPath = 'gcc'
-    const compileArgs = '-o main main.c'
-    const runArgs = project.config?.inputFormat?.split(' ') || []
+    const language = (project.config?.language || '').toLowerCase()
+    const inputArgs = project.config?.inputFormat?.split(' ') || []
     const expectedOutput = (project.config?.outputFormat || '').trim()
+    const isWindows = process.platform === 'win32'
 
     for (const [studentId, studentPath] of Object.entries(project.students || {})) {
       try {
-        // Derle
-        const compileCmd = `${compilerPath} ${compileArgs}`
-        await execPromise(compileCmd, { cwd: studentPath as string })
+        let compileCmd = ''
+        let runCmd = ''
 
-        // Çalıştır
-        
-        const isWindows = process.platform === 'win32'
-const runCmd = isWindows ? `main.exe ${runArgs.join(' ')}` : `./main ${runArgs.join(' ')}`
-const { stdout } = await execPromise(runCmd, {
-  cwd: studentPath as string,
-  timeout: 5000,
-})
+        if (language === 'c') {
+          compileCmd = isWindows ? `gcc main.c -o main.exe` : `gcc main.c -o main`
+          runCmd = isWindows ? `main.exe ${inputArgs.join(' ')}` : `./main ${inputArgs.join(' ')}`
+        } else if (language === 'java') {
+          compileCmd = `javac Main.java`
+          runCmd = `java Main ${inputArgs.join(' ')}`
+        } else if (language === 'python') {
+          runCmd = `python main.py ${inputArgs.join(' ')}`
+        } else {
+          throw new Error(`Unsupported language: ${language}`)
+        }
 
+        if (compileCmd) await execPromise(compileCmd, { cwd: studentPath as string })
+
+        const { stdout } = await execPromise(runCmd, {
+          cwd: studentPath as string,
+          timeout: 5000,
+        })
 
         const actualOutput = stdout.trim()
         const isCorrect = actualOutput === expectedOutput
@@ -165,6 +173,7 @@ const { stdout } = await execPromise(runCmd, {
     return { success: false, error: err.message }
   }
 })
+
 
 // Diğer işlemler
 ipcMain.handle('open-project', async () => {
