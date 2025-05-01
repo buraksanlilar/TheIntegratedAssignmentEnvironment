@@ -18,10 +18,12 @@ electron.contextBridge.exposeInMainWorld("api", {
     const [channel, ...omit] = args;
     return electron.ipcRenderer.invoke(channel, ...omit);
   },
-  // Özelleştirilmiş methodlar
-  createProject: () => electron.ipcRenderer.invoke("create-project"),
+  // specified methods
+  createProject: (name) => electron.ipcRenderer.invoke("create-project", name),
   openProject: () => electron.ipcRenderer.invoke("open-project"),
   manageConfigurations: () => electron.ipcRenderer.invoke("manage-configurations"),
   openHelp: () => electron.ipcRenderer.invoke("open-help"),
-  createProjectFolder: (projectName) => electron.ipcRenderer.invoke("create-project-folder", projectName)
+  selectZipFile: () => electron.ipcRenderer.invoke("select-zip"),
+  importZip: () => electron.ipcRenderer.invoke("import-zip"),
+  importZipToProject: (zipPath, projectPath) => electron.ipcRenderer.invoke("import-zip-to-project", zipPath, projectPath)
 });

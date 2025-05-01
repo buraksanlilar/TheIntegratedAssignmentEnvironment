@@ -6,9 +6,8 @@ const CreateProjectPage: React.FC = () => {
   const [projectName, setProjectName] = useState('')
   const [selectedConfigName, setSelectedConfigName] = useState('')
   const [configurations, setConfigurations] = useState<any[]>([])
+  const [zipPath, setZipPath] = useState<string | null>(null)
   const navigate = useNavigate()
-
-  // Modal state
   const [showModal, setShowModal] = useState(false)
   const [editConfigName, setEditConfigName] = useState('')
   const [editLanguage, setEditLanguage] = useState('')
@@ -25,30 +24,39 @@ const CreateProjectPage: React.FC = () => {
       alert('Please fill in all fields!')
       return
     }
-
+  
     const selectedConfig = configurations.find(config => config.configName === selectedConfigName)
     if (!selectedConfig) {
       alert('Selected configuration not found!')
       return
     }
-
+  
     try {
-      const result: { success: boolean; project?: any; path?: string; error?: string } = await window.api.createProject()
-
+      // 👇 projectName parametresi burada geçiliyor!
+      const result: { success: boolean; project?: any; path?: string; error?: string } = await window.api.createProject(projectName)
+  
       if (result.success) {
+        if (zipPath && result.path) {
+          const zipResult = await window.api.importZipToProject(zipPath, result.path)
+          if (!zipResult.success) {
+            alert('ZIP extract failed.')
+            return
+          }
+        }
+  
         const newProject = {
           projectName,
           configuration: selectedConfig,
           createdAt: new Date().toISOString(),
           students: [],
           results: [],
-          path: result.path || '' // klasör yolu da kaydediyoruz
+          path: result.path || ''
         }
-
+  
         const existingProjects = JSON.parse(localStorage.getItem('projects') || '[]')
         existingProjects.push(newProject)
         localStorage.setItem('projects', JSON.stringify(existingProjects))
-
+  
         alert('Project created successfully!')
         navigate('/')
       } else {
@@ -59,7 +67,7 @@ const CreateProjectPage: React.FC = () => {
       alert('An unexpected error occurred.')
     }
   }
-
+  
   const handleCancel = () => {
     navigate('/')
   }
@@ -143,6 +151,17 @@ const CreateProjectPage: React.FC = () => {
         </div>
       )}
 
+      <div className="form-group">
+        <label>Student Submissions (ZIP):</label>
+        <button onClick={async () => {
+          const result = await window.api.selectZipFile()
+          if (result.success) {
+            setZipPath(result.path?? '')
+          }
+        }}>Select ZIP File</button>
+        {zipPath && <p style={{ fontSize: '0.9rem' }}>{zipPath}</p>}
+      </div>
+
       <div className="button-row">
         <button onClick={handleCreate}>Create</button>
         <button onClick={handleCancel}>Cancel</button>
@@ -153,7 +172,6 @@ const CreateProjectPage: React.FC = () => {
         )}
       </div>
 
-      {/* Modal */}
       {showModal && (
         <div className="modal-wrapper">
           <div className="modal-content">

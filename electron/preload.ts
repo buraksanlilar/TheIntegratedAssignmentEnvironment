@@ -21,9 +21,11 @@ contextBridge.exposeInMainWorld('api', {
   },
 
   // specified methods
-  createProject: () => ipcRenderer.invoke('create-project'),
+  createProject: (name: string) => ipcRenderer.invoke('create-project', name),
   openProject: () => ipcRenderer.invoke('open-project'),
   manageConfigurations: () => ipcRenderer.invoke('manage-configurations'),
   openHelp: () => ipcRenderer.invoke('open-help'),
-  createProjectFolder: (projectName: string) => ipcRenderer.invoke('create-project-folder', projectName),
+  selectZipFile: () => ipcRenderer.invoke('select-zip'),
+  importZip: () => ipcRenderer.invoke('import-zip'),
+  importZipToProject: (zipPath: string, projectPath: string) => ipcRenderer.invoke('import-zip-to-project', zipPath, projectPath),
 })
