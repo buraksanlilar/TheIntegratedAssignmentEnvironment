@@ -138,7 +138,7 @@ ipcMain.handle('evaluate-project', async (_event, project: any) => {
           compileCmd = `javac Main.java`
           runCmd = `java Main ${inputArgs.join(' ')}`
         } else if (language === 'python') {
-          runCmd = `python main.py ${inputArgs.join(' ')}`
+          runCmd = `python3 main.py ${inputArgs.join(' ')}`
         } else {
           throw new Error(`Unsupported language: ${language}`)
         }

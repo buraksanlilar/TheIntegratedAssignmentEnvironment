@@ -1,101 +1,101 @@
 .manage-config-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 2rem;
-    min-height: 100vh;
-    text-align: center;
-    background-color: #1e1e1e;
-    color: white;
-    height: 100vh;          /* Tüm ekran yüksekliği kadar alan aç */
-    overflow-y: auto;       /* Eğer içerik taşarsa dikey scroll aktif et */
-    padding: 2rem;          /* İçeriden biraz boşluk ver */
-    box-sizing: border-box; /* Padding dışına taşmasın */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  min-height: 100vh;
+  text-align: center;
+  background-color: #1e1e1e;
+  color: white;
+  height: 100vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  position: relative;
+}
 
-  }
-  
-  .form-group {
-    margin-bottom: 1rem;
-    width: 300px;
-    text-align: left;
-  }
-  
-  .form-group label {
-    font-weight: bold;
-  }
-  
-  .form-group input {
-    width: 100%;
-    padding: 8px;
-    border-radius: 8px;
-    margin-top: 5px;
-    border: 1px solid #ccc;
-  }
-  
-  .button-row {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 2rem;
-  }
-  
-  .button-row button {
-    padding: 10px 20px;
-    font-size: 1rem;
-    background-color: #222;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
-  .button-row button:hover {
-    background-color: #444;
-  }
-  
-  ul {
-    list-style: none;
-    padding: 0;
-  }
-  
-  li {
-    margin-bottom: 1rem;
-  }
-  
-  .delete-button {
-    margin-left: 10px;
-    padding: 5px 10px;
-    background-color: #d11a2a;
-    border: none;
-    border-radius: 6px;
-    color: white;
-    cursor: pointer;
-  }
-  
-  .delete-button:hover {
-    background-color: #a30e1a;
-  }
-  .search-bar {
-    margin-bottom: 1rem;
-  }
-  
-  .search-bar input {
-    width: 300px;
-    padding: 8px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-  }
-  .edit-button {
-    margin-right: 8px;
-    padding: 5px 10px;
-    background-color: #130227; /* yeşil gibi bir renk */
-    border: none;
-    border-radius: 6px;
-    color: white;
-    cursor: pointer;
-  }
-  
-  .edit-button:hover {
-    background-color: #3e0c6c;
-  }
-  
+.back-button-top-left {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  padding: 8px 16px;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.back-button-top-left:hover {
+  background-color: #555;
+}
+
+.search-bar {
+  margin: 1.5rem 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.search-bar input {
+  width: 320px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #888;
+  background-color: #2c2c2c;
+  color: white;
+}
+
+.search-bar input::placeholder {
+  color: #aaa;
+}
+
+.search-icon {
+  font-size: 1.2rem;
+  color: #aaa;
+}
+
+li {
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #2c2c2c;
+  padding: 10px 16px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 600px;
+}
+
+li > span {
+  flex-grow: 1;
+  text-align: left;
+}
+
+.edit-button,
+.delete-button {
+  margin-left: 8px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.edit-button {
+  background-color: #3b3b3b;
+  color: white;
+}
+
+.edit-button:hover {
+  background-color: #5a5a5a;
+}
+
+.delete-button {
+  background-color: #d11a2a;
+  color: white;
+}
+
+.delete-button:hover {
+  background-color: #a30e1a;
+}

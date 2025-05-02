@@ -76,6 +76,8 @@ const ManageConfigurationsPage: React.FC = () => {
 
   return (
     <div className="manage-config-container">
+      <button className="back-button-top-left" onClick={handleBack}>Back</button>
+
       <h2>Manage Configurations</h2>
 
       <div className="form-group">
@@ -119,7 +121,7 @@ const ManageConfigurationsPage: React.FC = () => {
         <button onClick={handleAddOrUpdateConfiguration}>
           {editingIndex !== null ? 'Update Configuration' : 'Add Configuration'}
         </button>
-        <button onClick={handleBack}>Back</button>
+      
       </div>
 
       <h3>Existing Configurations</h3>
@@ -134,12 +136,14 @@ const ManageConfigurationsPage: React.FC = () => {
       <ul>
         {filteredConfigurations.map((config, index) => (
           <li key={index}>
+          <span>
             <strong>{config.configName}</strong> ({config.language}) | Input: {config.inputFormat} | Output: {config.outputFormat}
-            <div style={{ marginTop: '5px' }}>
-              <button className="edit-button" onClick={() => handleEditConfiguration(index)}>Edit</button>
-              <button className="delete-button" onClick={() => handleDeleteConfiguration(index)}>Delete</button>
-            </div>
-          </li>
+          </span>
+          <div>
+            <button className="edit-button" onClick={() => handleEditConfiguration(index)}>Edit</button>
+            <button className="delete-button" onClick={() => handleDeleteConfiguration(index)}>Delete</button>
+          </div>
+        </li>  
         ))}
       </ul>
     </div>
