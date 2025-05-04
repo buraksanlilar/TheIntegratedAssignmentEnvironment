@@ -10,16 +10,15 @@ const HomePage: React.FC = () => {
   }
 
   const handleOpenProject = () => {
-    navigate('/open') // Eskiden window.api.openProject çağrıyordu
+    navigate('/open')
   }
-  
 
   const handleManageConfigs = () => {
     navigate('/manage-configurations')
   }
 
   const handleHelp = () => {
-    window.api.openHelp()
+    navigate('/help') // 👈 YÖNLENDİRME GÜNCELLENDİ
   }
 
   return (
