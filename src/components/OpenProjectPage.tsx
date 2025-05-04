@@ -17,7 +17,7 @@ const OpenProjectPage: React.FC = () => {
 
   return (
     <div className="open-project-container">
-      <h2>Open Existing Project</h2>
+      <h2>📁 Open Existing Project</h2>
 
       {projects.length === 0 ? (
         <p>No projects found.</p>
@@ -25,13 +25,17 @@ const OpenProjectPage: React.FC = () => {
         <ul className="project-list">
           {projects.map((project, index) => (
             <li key={index} className="project-card">
-              <h3>{project.name}</h3>
-              <p><strong>Configuration:</strong> {project.config?.configName}</p>
-              <p><strong>Student Count:</strong> {Object.keys(project.students || {}).length}</p>
-              <p><strong>Created:</strong> {new Date(project.createdAt).toLocaleString()}</p>
-              <button onClick={() => handleOpenProject(project.name)}>
-                Open Project
-              </button>
+              <div className="card-content">
+                <h3 className="project-title">{project.name}</h3>
+                <p><strong>Configuration:</strong> {project.config?.configName}</p>
+                <p><strong>Student Count:</strong> {Object.keys(project.students || {}).length}</p>
+                <p><strong>Created:</strong> {new Date(project.createdAt).toLocaleString()}</p>
+              </div>
+              <div className="card-button">
+                <button onClick={() => handleOpenProject(project.name)}>
+                  Open Project
+                </button>
+              </div>
             </li>
           ))}
         </ul>
