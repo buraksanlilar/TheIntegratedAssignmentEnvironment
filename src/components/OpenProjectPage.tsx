@@ -31,9 +31,13 @@ const OpenProjectPage: React.FC = () => {
                 <p><strong>Student Count:</strong> {Object.keys(project.students || {}).length}</p>
                 <p><strong>Created:</strong> {new Date(project.createdAt).toLocaleString()}</p>
               </div>
-              <div className="card-button">
+
+              <div className="card-buttons">
                 <button onClick={() => handleOpenProject(project.name)}>
                   Open Project
+                </button>
+                <button className="delete-button" disabled>
+                  Delete
                 </button>
               </div>
             </li>
