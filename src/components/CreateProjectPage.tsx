@@ -7,12 +7,15 @@ const CreateProjectPage: React.FC = () => {
   const [selectedConfigName, setSelectedConfigName] = useState("");
   const [configurations, setConfigurations] = useState<any[]>([]);
   const [zipFolderPath, setZipFolderPath] = useState<string | null>(null);
-  const navigate = useNavigate();
-  const [showModal, setShowModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [editConfigName, setEditConfigName] = useState("");
   const [editLanguage, setEditLanguage] = useState("");
   const [editInputFormat, setEditInputFormat] = useState("");
   const [editOutputFormat, setEditOutputFormat] = useState("");
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedConfigs = JSON.parse(localStorage.getItem("configurations") || "[]");
@@ -21,7 +24,7 @@ const CreateProjectPage: React.FC = () => {
 
   const handleCreate = async () => {
     if (!projectName || !selectedConfigName) {
-      alert("Please fill in all fields!");
+      setErrorMsg("Please fill in all fields!");
       return;
     }
 
@@ -29,48 +32,46 @@ const CreateProjectPage: React.FC = () => {
       (config) => config.configName === selectedConfigName
     );
     if (!selectedConfig) {
-      alert("Selected configuration not found!");
+      setErrorMsg("Selected configuration not found!");
       return;
     }
 
     try {
       const result = await window.api.createProject(projectName);
-
-      if (result.success) {
-        let students: Record<string, string> = {};
-
-        if (zipFolderPath) {
-          const processResult = await window.api.processZipFolder(zipFolderPath, projectName);
-
-          if (!processResult.success) {
-            alert(`ZIP extract failed: ${processResult.error}`);
-            return;
-          }
-
-          for (const entry of processResult.students) {
-            students[entry.studentId] = entry.path;
-          }
-        }
-
-        const existingProjects = JSON.parse(localStorage.getItem("projects") || "[]");
-        const newProject = {
-          name: projectName,
-          config: selectedConfig,
-          students: students,
-          createdAt: new Date().toISOString() // 👈 Oluşturulma zamanı burada
-        };
-        
-
-        localStorage.setItem("projects", JSON.stringify([...existingProjects, newProject]));
-
-        alert("Project created successfully!");
-        navigate("/");
-      } else {
-        alert(`Failed to create project. ${result.error || ""}`);
+      if (!result.success) {
+        setErrorMsg(`Failed to create project. ${result.error || ""}`);
+        return;
       }
-    } catch (error) {
-      console.error("Error creating project:", error);
-      alert("An unexpected error occurred.");
+
+      let students: Record<string, string> = {};
+      if (zipFolderPath) {
+        const processResult = await window.api.processZipFolder(zipFolderPath, projectName);
+        if (!processResult.success) {
+          setErrorMsg(`ZIP extract failed: ${processResult.error}`);
+          return;
+        }
+        for (const entry of processResult.students) {
+          students[entry.studentId] = entry.path;
+        }
+      }
+
+      const existingProjects = JSON.parse(localStorage.getItem("projects") || "[]");
+      const newProject = {
+        name: projectName,
+        config: selectedConfig,
+        students,
+        createdAt: new Date().toISOString(),
+      };
+      localStorage.setItem("projects", JSON.stringify([...existingProjects, newProject]));
+
+      setSuccessMsg(`Project "${projectName}" created successfully!`);
+      // reset form
+      setProjectName("");
+      setSelectedConfigName("");
+      setZipFolderPath(null);
+    } catch (err: any) {
+      console.error(err);
+      setErrorMsg("An unexpected error occurred.");
     }
   };
 
@@ -78,50 +79,46 @@ const CreateProjectPage: React.FC = () => {
     navigate("/");
   };
 
-  const handleOpenModal = () => {
+  const openEditModal = () => {
     if (!selectedConfigName) {
-      alert("Please select a configuration to edit!");
+      setErrorMsg("Please select a configuration to edit!");
       return;
     }
-
-    const config = configurations.find(
-      (c) => c.configName === selectedConfigName
-    );
-    if (!config) return;
-
+    const config = configurations.find((c) => c.configName === selectedConfigName);
+    if (!config) {
+      setErrorMsg("Configuration not found!");
+      return;
+    }
     setEditConfigName(config.configName);
     setEditLanguage(config.language);
     setEditInputFormat(config.inputFormat);
     setEditOutputFormat(config.outputFormat);
-    setShowModal(true);
+    setShowEditModal(true);
   };
 
-  const handleCloseModal = () => {
-    setShowModal(false);
-  };
+  const closeEditModal = () => setShowEditModal(false);
 
-  const handleSaveEdit = () => {
-    const updatedConfigs = configurations.map((config) => {
-      if (config.configName === selectedConfigName) {
-        return {
-          configName: editConfigName,
-          language: editLanguage,
-          inputFormat: editInputFormat,
-          outputFormat: editOutputFormat,
-        };
-      }
-      return config;
-    });
-
-    setConfigurations(updatedConfigs);
-    localStorage.setItem("configurations", JSON.stringify(updatedConfigs));
+  const saveEdit = () => {
+    const updated = configurations.map((cfg) =>
+      cfg.configName === selectedConfigName
+        ? {
+            configName: editConfigName,
+            language: editLanguage,
+            inputFormat: editInputFormat,
+            outputFormat: editOutputFormat,
+          }
+        : cfg
+    );
+    setConfigurations(updated);
+    localStorage.setItem("configurations", JSON.stringify(updated));
     setSelectedConfigName(editConfigName);
-    setShowModal(false);
+    setShowEditModal(false);
   };
 
-  const selectedConfig = configurations.find(
-    (config) => config.configName === selectedConfigName
-  );
+  const closeError = () => setErrorMsg(null);
+  const closeSuccess = () => setSuccessMsg(null);
+
+  const selectedConfig = configurations.find((cfg) => cfg.configName === selectedConfigName);
 
   return (
     <div className="create-project-container">
@@ -143,8 +140,8 @@ const CreateProjectPage: React.FC = () => {
           onChange={(e) => setSelectedConfigName(e.target.value)}
         >
           <option value="">Select Configuration...</option>
-          {configurations.map((config, index) => (
-            <option key={index} value={config.configName}>
+          {configurations.map((config, idx) => (
+            <option key={idx} value={config.configName}>
               {config.configName} ({config.language})
             </option>
           ))}
@@ -165,17 +162,14 @@ const CreateProjectPage: React.FC = () => {
         <label>Student Submissions Folder:</label>
         <button
           onClick={async () => {
-            const result = await window.api.selectZipFolder();
-            if (result.success && result.folderPath) {
-              setZipFolderPath(result.folderPath);
-            }
+            const res = await window.api.selectZipFolder();
+            if (res.success && res.folderPath) setZipFolderPath(res.folderPath);
           }}
         >
           Select ZIP Folder
         </button>
-
         {zipFolderPath && (
-          <p style={{ fontSize: "0.9rem", marginTop: "10px" }}>{zipFolderPath}</p>
+          <p style={{ fontSize: "0.9rem", marginTop: "0.5rem" }}>{zipFolderPath}</p>
         )}
       </div>
 
@@ -183,17 +177,16 @@ const CreateProjectPage: React.FC = () => {
         <button onClick={handleCreate}>Create</button>
         <button onClick={handleCancel}>Cancel</button>
         {selectedConfigName && (
-          <button onClick={handleOpenModal} className="edit-config-button">
-            ✏️ Edit
+          <button onClick={openEditModal} className="edit-config-button">
+            ✏️ Edit Configuration
           </button>
         )}
       </div>
 
-      {showModal && (
-        <div className="modal-wrapper">
-          <div className="modal-content">
-            <h2>Edit Configuration</h2>
-
+      {showEditModal && (
+        <div className="confirm-overlay">
+          <div className="confirm-box">
+            <h3>Edit Configuration</h3>
             <div className="form-group">
               <label>Configuration Name:</label>
               <input
@@ -202,7 +195,6 @@ const CreateProjectPage: React.FC = () => {
                 onChange={(e) => setEditConfigName(e.target.value)}
               />
             </div>
-
             <div className="form-group">
               <label>Language:</label>
               <input
@@ -211,7 +203,6 @@ const CreateProjectPage: React.FC = () => {
                 onChange={(e) => setEditLanguage(e.target.value)}
               />
             </div>
-
             <div className="form-group">
               <label>Input Format:</label>
               <input
@@ -220,7 +211,6 @@ const CreateProjectPage: React.FC = () => {
                 onChange={(e) => setEditInputFormat(e.target.value)}
               />
             </div>
-
             <div className="form-group">
               <label>Expected Output Format:</label>
               <input
@@ -229,10 +219,31 @@ const CreateProjectPage: React.FC = () => {
                 onChange={(e) => setEditOutputFormat(e.target.value)}
               />
             </div>
+            <div className="confirm-actions">
+              <button onClick={saveEdit}>Save</button>
+              <button onClick={closeEditModal}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
 
-            <div className="modal-buttons">
-              <button onClick={handleSaveEdit}>Save</button>
-              <button onClick={handleCloseModal}>Cancel</button>
+      {errorMsg && (
+        <div className="confirm-overlay">
+          <div className="confirm-box">
+            <p>{errorMsg}</p>
+            <div className="confirm-actions">
+              <button onClick={closeError}>OK</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {successMsg && (
+        <div className="confirm-overlay">
+          <div className="confirm-box">
+            <p>{successMsg}</p>
+            <div className="confirm-actions">
+              <button onClick={closeSuccess}>OK</button>
             </div>
           </div>
         </div>

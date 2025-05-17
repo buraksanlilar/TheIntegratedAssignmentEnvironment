@@ -10,6 +10,8 @@ const ManageConfigurationsPage: React.FC = () => {
   const [configurations, setConfigurations] = useState<any[]>([])
   const [editingIndex, setEditingIndex] = useState<number | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [toDeleteIndex, setToDeleteIndex] = useState<number | null>(null)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -19,7 +21,7 @@ const ManageConfigurationsPage: React.FC = () => {
 
   const handleAddOrUpdateConfiguration = () => {
     if (!configName || !language || !inputFormat || !outputFormat) {
-      alert('Please fill in all fields!')
+      setErrorMsg('Please fill in all fields!')
       return
     }
 
@@ -52,19 +54,27 @@ const ManageConfigurationsPage: React.FC = () => {
     setEditingIndex(index)
   }
 
-  const handleDeleteConfiguration = (index: number) => {
-    const updatedConfigs = configurations.filter((_, i) => i !== index)
+  const confirmDeleteConfiguration = (index: number) => {
+    setToDeleteIndex(index)
+  }
+
+  const doDeleteConfiguration = () => {
+    if (toDeleteIndex === null) return
+    const updatedConfigs = configurations.filter((_, i) => i !== toDeleteIndex)
     setConfigurations(updatedConfigs)
     localStorage.setItem('configurations', JSON.stringify(updatedConfigs))
-
-    if (editingIndex === index) {
+    if (editingIndex === toDeleteIndex) {
       setEditingIndex(null)
       setConfigName('')
       setLanguage('')
       setInputFormat('')
       setOutputFormat('')
     }
+    setToDeleteIndex(null)
   }
+
+  const cancelDelete = () => setToDeleteIndex(null)
+  const closeError = () => setErrorMsg(null)
 
   const handleBack = () => {
     navigate('/')
@@ -121,7 +131,6 @@ const ManageConfigurationsPage: React.FC = () => {
         <button onClick={handleAddOrUpdateConfiguration}>
           {editingIndex !== null ? 'Update Configuration' : 'Add Configuration'}
         </button>
-      
       </div>
 
       <h3>Existing Configurations</h3>
@@ -136,16 +145,41 @@ const ManageConfigurationsPage: React.FC = () => {
       <ul>
         {filteredConfigurations.map((config, index) => (
           <li key={index}>
-          <span>
-            <strong>{config.configName}</strong> ({config.language}) | Input: {config.inputFormat} | Output: {config.outputFormat}
-          </span>
-          <div>
-            <button className="edit-button" onClick={() => handleEditConfiguration(index)}>Edit</button>
-            <button className="delete-button" onClick={() => handleDeleteConfiguration(index)}>Delete</button>
-          </div>
-        </li>  
+            <span>
+              <strong>{config.configName}</strong> ({config.language}) | Input: {config.inputFormat} | Output: {config.outputFormat}
+            </span>
+            <div>
+              <button className="edit-button" onClick={() => handleEditConfiguration(index)}>Edit</button>
+              <button className="delete-button" onClick={() => confirmDeleteConfiguration(index)}>Delete</button>
+            </div>
+          </li>
         ))}
       </ul>
+
+      {/* === ERROR MODAL === */}
+      {errorMsg && (
+        <div className="confirm-overlay">
+          <div className="confirm-box">
+            <p>{errorMsg}</p>
+            <div className="confirm-actions">
+              <button onClick={closeError}>OK</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* === DELETE CONFIRMATION MODAL === */}
+      {toDeleteIndex !== null && (
+        <div className="confirm-overlay">
+          <div className="confirm-box">
+            <p>Are you sure you want to delete configuration &quot;{configurations[toDeleteIndex].configName}&quot;?</p>
+            <div className="confirm-actions">
+              <button onClick={doDeleteConfiguration}>Yes, Delete</button>
+              <button onClick={cancelDelete}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

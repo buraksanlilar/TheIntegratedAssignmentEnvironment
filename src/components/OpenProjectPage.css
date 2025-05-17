@@ -66,7 +66,7 @@
   justify-content: center;
   align-items: center;
   gap: 0.8rem;
-  width: 160px; /* ❗️butonların sabit genişliği */
+  width: 160px;
 }
 
 .card-buttons button {
@@ -92,9 +92,9 @@
   background-color: #2d2d2d;
   border-color: #d11a2a;
   color: #ffdddd;
-  cursor: not-allowed;
 }
 
+/* BACK BUTTON */
 .open-project-container > button {
   margin-top: 3rem;
   padding: 12px 24px;
@@ -110,4 +110,64 @@
 
 .open-project-container > button:hover {
   background-color: #2a2a2a;
+}
+
+/* CONFIRM MODAL */
+.confirm-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.confirm-box {
+  background: #1e1e1e;
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 90%;
+  width: 350px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  color: #e0e0e0;
+}
+
+.confirm-box p {
+  margin: 0 0 1.5rem;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.confirm-actions button {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.confirm-actions button:hover {
+  transform: translateY(-1px);
+}
+
+.confirm-actions button:first-child { /* Yes, Delete */
+  background-color: #d11a2a;
+  color: #ffffff;
+}
+
+.confirm-actions button:last-child { /* Cancel */
+  background-color: #444;
+  color: #ddd;
 }

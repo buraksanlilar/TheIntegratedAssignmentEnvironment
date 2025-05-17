@@ -87,7 +87,7 @@ ipcMain.handle('process-zip-folder', async (_event, zipFolderPath: string, proje
     const projectRoot = path.join(PROJECTS_DIR, projectName)
     if (!fs.existsSync(projectRoot)) {
       fs.mkdirSync(projectRoot, { recursive: true })
-    }
+    } 
 
     const zipFiles = fs.readdirSync(zipFolderPath).filter(f => f.endsWith('.zip'))
     const extractedStudents: { studentId: string; path: string }[] = []
