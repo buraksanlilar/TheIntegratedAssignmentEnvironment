@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { ReportManager } from "../utils/ReportManager"; // ✅ yeni eklendi
 
 const ProjectDetailPage: React.FC = () => {
   const { projectName } = useParams();
@@ -27,7 +28,6 @@ const ProjectDetailPage: React.FC = () => {
       if (result.success) {
         setResults(result.results);
 
-        // localStorage'ı güncelle
         const allProjects = JSON.parse(localStorage.getItem("projects") || "[]");
         const updatedProjects = allProjects.map((p: any) =>
           p.name === project.name ? { ...p, results: result.results } : p
@@ -62,42 +62,43 @@ const ProjectDetailPage: React.FC = () => {
         <p>No student folders found.</p>
       ) : (
         <ul style={{ listStyle: "none", padding: 0 }}>
-  {Object.keys(project.students).map((id) => {
-    const result = results.find((r) => r.studentId === id)
-    return (
-      <li
-        key={id}
-        style={{
-          padding: "0.5rem 1rem",
-          margin: "0.5rem 0",
-          backgroundColor: "#2c2c2c",
-          borderRadius: "8px",
-        }}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <span>{id}</span>
-          <span style={{ fontWeight: "bold" }}>{result?.status}</span>
-        </div>
+          {Object.keys(project.students).map((id) => {
+            const result = results.find((r) => r.studentId === id);
+            return (
+              <li
+                key={id}
+                style={{
+                  padding: "0.5rem 1rem",
+                  margin: "0.5rem 0",
+                  backgroundColor: "#2c2c2c",
+                  borderRadius: "8px",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span>{id}</span>
+                  <span style={{ fontWeight: "bold" }}>{result?.status}</span>
+                </div>
 
-        {result?.status === 'Failure' && (
-          <div style={{ marginTop: "0.5rem", fontSize: "0.85rem", color: "#ccc" }}>
-            {result.error && <div>❌ Error: {result.error}</div>}
-            {result.actualOutput && <div>📤 Output: {result.actualOutput}</div>}
-            <div>✅ Expected: {project.config?.outputFormat}</div>
-          </div>
-        )}
-      </li>
-    )
-  })}
-</ul>
-
+                {result?.status === 'Failure' && (
+                  <div style={{ marginTop: "0.5rem", fontSize: "0.85rem", color: "#ccc" }}>
+                    {result.error && <div>❌ Error: {result.error}</div>}
+                    {result.actualOutput && <div>📤 Output: {result.actualOutput}</div>}
+                    <div>✅ Expected: {project.config?.outputFormat}</div>
+                  </div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
       )}
 
-      <div className="button-row">
+      <div className="button-row" style={{ marginTop: "2rem" }}>
         <button onClick={handleEvaluate} disabled={loading}>
           {loading ? "Evaluating..." : "Evaluate"}
         </button>
         <button onClick={() => navigate("/")}>Back</button>
+        <button onClick={() => ReportManager.exportToCSV(results)}>📄 Export CSV</button>
+        <button onClick={() => ReportManager.exportToPDF(results)}>🧾 Export PDF</button>
       </div>
     </div>
   );

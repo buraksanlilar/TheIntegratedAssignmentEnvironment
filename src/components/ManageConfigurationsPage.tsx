@@ -15,54 +15,50 @@ const ManageConfigurationsPage: React.FC = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    const storedConfigs = JSON.parse(localStorage.getItem('configurations') || '[]')
-    setConfigurations(storedConfigs)
+    const stored = JSON.parse(localStorage.getItem('configurations') || '[]')
+    setConfigurations(stored)
   }, [])
 
-  const handleAddOrUpdateConfiguration = () => {
+  const handleAddOrUpdate = () => {
     if (!configName || !language || !inputFormat || !outputFormat) {
       setErrorMsg('Please fill in all fields!')
       return
     }
-
     const newConfig = { configName, language, inputFormat, outputFormat }
-    let updatedConfigs
-
+    const updated = [...configurations]
     if (editingIndex !== null) {
-      updatedConfigs = [...configurations]
-      updatedConfigs[editingIndex] = newConfig
-      setEditingIndex(null)
+      updated[editingIndex] = newConfig
     } else {
-      updatedConfigs = [...configurations, newConfig]
+      updated.push(newConfig)
     }
-
-    setConfigurations(updatedConfigs)
-    localStorage.setItem('configurations', JSON.stringify(updatedConfigs))
-
+    setConfigurations(updated)
+    localStorage.setItem('configurations', JSON.stringify(updated))
     setConfigName('')
     setLanguage('')
     setInputFormat('')
     setOutputFormat('')
+    setEditingIndex(null)
   }
 
-  const handleEditConfiguration = (index: number) => {
-    const config = configurations[index]
-    setConfigName(config.configName)
-    setLanguage(config.language)
-    setInputFormat(config.inputFormat)
-    setOutputFormat(config.outputFormat)
+  const handleEdit = (index: number) => {
+    const c = configurations[index]
+    setConfigName(c.configName)
+    setLanguage(c.language)
+    setInputFormat(c.inputFormat)
+    setOutputFormat(c.outputFormat)
     setEditingIndex(index)
   }
 
-  const confirmDeleteConfiguration = (index: number) => {
+  const confirmDelete = (index: number) => {
     setToDeleteIndex(index)
   }
 
-  const doDeleteConfiguration = () => {
+  const doDelete = () => {
     if (toDeleteIndex === null) return
-    const updatedConfigs = configurations.filter((_, i) => i !== toDeleteIndex)
-    setConfigurations(updatedConfigs)
-    localStorage.setItem('configurations', JSON.stringify(updatedConfigs))
+    const updated = configurations.filter((_, i) => i !== toDeleteIndex)
+    setConfigurations(updated)
+    localStorage.setItem('configurations', JSON.stringify(updated))
+    setToDeleteIndex(null)
     if (editingIndex === toDeleteIndex) {
       setEditingIndex(null)
       setConfigName('')
@@ -70,38 +66,54 @@ const ManageConfigurationsPage: React.FC = () => {
       setInputFormat('')
       setOutputFormat('')
     }
-    setToDeleteIndex(null)
   }
 
-  const cancelDelete = () => setToDeleteIndex(null)
-  const closeError = () => setErrorMsg(null)
-
-  const handleBack = () => {
-    navigate('/')
+  const handleExport = () => {
+    const blob = new Blob([JSON.stringify(configurations, null, 2)], {
+      type: 'application/json',
+    })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'configurations.json'
+    a.click()
+    URL.revokeObjectURL(url)
   }
 
-  const filteredConfigurations = configurations.filter(config =>
-    config.configName.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  const handleImport = () => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = '.json'
+    input.onchange = async (e: any) => {
+      const file = e.target.files[0]
+      if (!file) return
+      try {
+        const text = await file.text()
+        const imported = JSON.parse(text)
+        if (!Array.isArray(imported)) throw new Error('Invalid file format.')
+        setConfigurations(imported)
+        localStorage.setItem('configurations', JSON.stringify(imported))
+      } catch (err: any) {
+        setErrorMsg('Import failed: ' + err.message)
+      }
+    }
+    input.click()
+  }
 
   return (
     <div className="manage-config-container">
-      <button className="back-button-top-left" onClick={handleBack}>Back</button>
+      <button className="back-button-top-left" onClick={() => navigate('/')}>Back</button>
 
       <h2>Manage Configurations</h2>
 
       <div className="form-group">
         <label>Configuration Name:</label>
-        <input
-          type="text"
-          value={configName}
-          onChange={(e) => setConfigName(e.target.value)}
-        />
+        <input value={configName} onChange={e => setConfigName(e.target.value)} />
       </div>
 
       <div className="form-group">
         <label>Language:</label>
-        <select value={language} onChange={(e) => setLanguage(e.target.value)}>
+        <select value={language} onChange={e => setLanguage(e.target.value)}>
           <option value="">Select Language</option>
           <option value="C">C</option>
           <option value="Java">Java</option>
@@ -111,71 +123,65 @@ const ManageConfigurationsPage: React.FC = () => {
 
       <div className="form-group">
         <label>Input Format:</label>
-        <input
-          type="text"
-          value={inputFormat}
-          onChange={(e) => setInputFormat(e.target.value)}
-        />
+        <input value={inputFormat} onChange={e => setInputFormat(e.target.value)} />
       </div>
 
       <div className="form-group">
         <label>Expected Output Format:</label>
-        <input
-          type="text"
-          value={outputFormat}
-          onChange={(e) => setOutputFormat(e.target.value)}
-        />
+        <input value={outputFormat} onChange={e => setOutputFormat(e.target.value)} />
       </div>
 
       <div className="button-row">
-        <button onClick={handleAddOrUpdateConfiguration}>
+        <button onClick={handleAddOrUpdate}>
           {editingIndex !== null ? 'Update Configuration' : 'Add Configuration'}
         </button>
+        <button onClick={handleImport}>📥 Import</button>
+        <button onClick={handleExport}>📤 Export</button>
       </div>
 
       <h3>Existing Configurations</h3>
       <div className="search-bar">
         <input
-          type="text"
           placeholder="Search configurations..."
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={e => setSearchQuery(e.target.value)}
         />
       </div>
+
       <ul>
-        {filteredConfigurations.map((config, index) => (
-          <li key={index}>
-            <span>
-              <strong>{config.configName}</strong> ({config.language}) | Input: {config.inputFormat} | Output: {config.outputFormat}
-            </span>
-            <div>
-              <button className="edit-button" onClick={() => handleEditConfiguration(index)}>Edit</button>
-              <button className="delete-button" onClick={() => confirmDeleteConfiguration(index)}>Delete</button>
-            </div>
-          </li>
-        ))}
+        {configurations
+          .filter(c => c.configName.toLowerCase().includes(searchQuery.toLowerCase()))
+          .map((c, i) => (
+            <li key={i}>
+              <span>
+                <strong>{c.configName}</strong> ({c.language}) | Input: {c.inputFormat} | Output: {c.outputFormat}
+              </span>
+              <div>
+                <button className="edit-button" onClick={() => handleEdit(i)}>Edit</button>
+                <button className="delete-button" onClick={() => confirmDelete(i)}>Delete</button>
+              </div>
+            </li>
+          ))}
       </ul>
 
-      {/* === ERROR MODAL === */}
       {errorMsg && (
         <div className="confirm-overlay">
           <div className="confirm-box">
             <p>{errorMsg}</p>
             <div className="confirm-actions">
-              <button onClick={closeError}>OK</button>
+              <button onClick={() => setErrorMsg(null)}>OK</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* === DELETE CONFIRMATION MODAL === */}
       {toDeleteIndex !== null && (
         <div className="confirm-overlay">
           <div className="confirm-box">
-            <p>Are you sure you want to delete configuration &quot;{configurations[toDeleteIndex].configName}&quot;?</p>
+            <p>Are you sure you want to delete "{configurations[toDeleteIndex].configName}"?</p>
             <div className="confirm-actions">
-              <button onClick={doDeleteConfiguration}>Yes, Delete</button>
-              <button onClick={cancelDelete}>Cancel</button>
+              <button onClick={doDelete}>Yes, Delete</button>
+              <button onClick={() => setToDeleteIndex(null)}>Cancel</button>
             </div>
           </div>
         </div>
