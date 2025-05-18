@@ -58,52 +58,104 @@ const ProjectDetailPage: React.FC = () => {
       {totalCount === 0 ? (
         <p>No student folders found.</p>
       ) : (
-        <>
-          <table style={{ width: '100%', marginTop: '1rem', backgroundColor: '#1e1e1e', borderCollapse: 'collapse' }}>
-            <thead style={{ backgroundColor: '#333', color: '#fff' }}>
-              <tr>
-                <th style={{ padding: '8px', border: '1px solid #555' }}>#</th>
-                <th style={{ padding: '8px', border: '1px solid #555' }}>Student ID</th>
-                <th style={{ padding: '8px', border: '1px solid #555' }}>Compile Status</th>
-                <th style={{ padding: '8px', border: '1px solid #555' }}>Run Status</th>
-                <th style={{ padding: '8px', border: '1px solid #555' }}>Compare Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Object.keys(project.students).map((id, index) => {
-                const r = results.find(res => res.studentId === id);
-                return (
-                  <tr key={id}>
-                    <td style={{ padding: '8px', border: '1px solid #444', textAlign: 'center' }}>{index + 1}</td>
-                    <td style={{ padding: '8px', border: '1px solid #444' }}>{id}</td>
-                    <td style={{ padding: '8px', border: '1px solid #444' }}>
-                      {r ? (r.error?.includes('gcc') || r.error?.includes('compile') ? 'Failure' : 'Success') : '-'}
-                    </td>
-                    <td style={{ padding: '8px', border: '1px solid #444' }}>
-                      {r ? (r.error?.includes('timeout') ? 'Timeout' : r.status === 'Success' ? 'Success' : 'Failure') : '-'}
-                    </td>
-                    <td style={{ padding: '8px', border: '1px solid #444' }}>
-                      {r ? (r.status === 'Success' ? 'Success' : 'Failure') : '-'}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+        <table style={{
+          width: '100%',
+          marginTop: '1rem',
+          borderCollapse: 'collapse',
+          borderRadius: '10px',
+          overflow: 'hidden',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.4)'
+        }}>
+          <thead style={{ backgroundColor: '#292929', color: '#fff' }}>
+            <tr>
+              <th style={{ padding: '10px' }}>#</th>
+              <th style={{ padding: '10px' }}>Student ID</th>
+              <th style={{ padding: '10px', textAlign: 'center' }}>Compile</th>
+              <th style={{ padding: '10px', textAlign: 'center' }}>Run</th>
+              <th style={{ padding: '10px', textAlign: 'center' }}>Compare</th>
+              <th style={{ padding: '10px', textAlign: 'left' }}>Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.keys(project.students).map((id, index) => {
+              const r = results.find(res => res.studentId === id);
+              const error = r?.error?.toLowerCase() || "";
+              const compileStatus = r ? (error.includes("compile") ? "Failure" : "Success") : "-";
+              const runStatus = r
+                ? error.includes("timeout")
+                  ? "Timeout"
+                  : r.status === "Success"
+                  ? "Success"
+                  : "Failure"
+                : "-";
+              const compareStatus = r ? (r.status === "Success" ? "Success" : "Failure") : "-";
 
-          <p style={{ marginTop: '1rem' }}>
-            ✅ {passedCount} of {totalCount} students passed
-          </p>
-        </>
+              const reason = error.includes("compile")
+                ? "Compile Error"
+                : error.includes("timeout")
+                ? "Timeout"
+                : error.includes("runtime")
+                ? "Runtime Error"
+                : r?.status === "Failure"
+                ? "Output Mismatch"
+                : "Success";
+
+              return (
+                <tr key={id} style={{ backgroundColor: index % 2 === 0 ? '#1e1e1e' : '#252525' }}>
+                  <td style={{ padding: '10px', textAlign: 'center' }}>{index + 1}</td>
+                  <td style={{ padding: '10px' }}>{id}</td>
+                  <td style={{ padding: '10px', textAlign: 'center' }}>{compileStatus}</td>
+                  <td style={{ padding: '10px', textAlign: 'center' }}>{runStatus}</td>
+                  <td style={{ padding: '10px', textAlign: 'center' }}>{compareStatus}</td>
+                  <td style={{ padding: '10px' }}>
+                    <div style={{
+                      backgroundColor: '#2a2a2a',
+                      color: '#ddd',
+                      border: '1px solid #444',
+                      borderRadius: "8px",
+                      padding: "10px",
+                      fontSize: "0.85rem",
+                      lineHeight: "1.5"
+                    }}>
+                      {r?.status === "Success" ? (
+                        <span style={{ fontWeight: 'bold' }}>Successful</span>
+                      ) : (
+                        <>
+                          <div><strong>{reason}</strong></div>
+                          {r?.error && <div><span style={{ color: "#bbb" }}>Error:</span> {r.error}</div>}
+                          {r?.actualOutput && <div><span style={{ color: "#bbb" }}>Output:</span> {r.actualOutput}</div>}
+                          <div><span style={{ color: "#bbb" }}>Expected:</span> {project.config?.outputFormat}</div>
+                        </>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       )}
+
+      <div style={{ marginTop: '1rem', fontSize: '1.1rem' }}>
+        <span style={{
+          backgroundColor: passedCount === totalCount ? '#4caf50' : '#333',
+          color: 'white',
+          padding: '6px 12px',
+          borderRadius: '20px',
+          fontWeight: 'bold',
+          display: 'inline-block'
+        }}>
+          {passedCount} of {totalCount} students passed
+        </span>
+      </div>
 
       <div className="button-row" style={{ marginTop: "2rem" }}>
         <button onClick={handleEvaluate} disabled={loading}>
           {loading ? "Evaluating..." : "Evaluate"}
         </button>
         <button onClick={() => navigate("/")}>Back</button>
-        <button onClick={() => ReportManager.exportToCSV(results)}>📄 Export CSV</button>
-        <button onClick={() => ReportManager.exportToPDF(results)}>🧾 Export PDF</button>
+        <button onClick={() => ReportManager.exportToCSV(results)}>Export CSV</button>
+        <button onClick={() => ReportManager.exportToPDF(results)}>Export PDF</button>
       </div>
     </div>
   );
