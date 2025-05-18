@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ReportManager } from "../utils/ReportManager"; // ✅ yeni eklendi
+import { ReportManager } from "../utils/ReportManager";
 
 const ProjectDetailPage: React.FC = () => {
   const { projectName } = useParams();
@@ -44,52 +44,57 @@ const ProjectDetailPage: React.FC = () => {
     setLoading(false);
   };
 
-  const getStatus = (id: string) => {
-    const result = results.find((r) => r.studentId === id);
-    return result ? result.status : "";
-  };
-
-  if (!project) return <p>Loading...</p>;
+  const passedCount = results.filter(r => r.status === 'Success').length;
+  const totalCount = Object.keys(project?.students || {}).length;
 
   return (
     <div className="create-project-container">
-      <h2>Project: {project.name}</h2>
-      <p><strong>Created:</strong> {new Date(project.createdAt).toLocaleString()}</p>
-      <p><strong>Configuration:</strong> {project.config?.configName}</p>
+      <h2>Project: {project?.name}</h2>
+      <p><strong>Created:</strong> {new Date(project?.createdAt).toLocaleString()}</p>
+      <p><strong>Configuration:</strong> {project?.config?.configName}</p>
 
-      <h3 style={{ marginTop: "2rem" }}>Student Submissions</h3>
-      {Object.keys(project.students || {}).length === 0 ? (
+      <h3 style={{ marginTop: "2rem" }}>Evaluation Results</h3>
+
+      {totalCount === 0 ? (
         <p>No student folders found.</p>
       ) : (
-        <ul style={{ listStyle: "none", padding: 0 }}>
-          {Object.keys(project.students).map((id) => {
-            const result = results.find((r) => r.studentId === id);
-            return (
-              <li
-                key={id}
-                style={{
-                  padding: "0.5rem 1rem",
-                  margin: "0.5rem 0",
-                  backgroundColor: "#2c2c2c",
-                  borderRadius: "8px",
-                }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span>{id}</span>
-                  <span style={{ fontWeight: "bold" }}>{result?.status}</span>
-                </div>
+        <>
+          <table style={{ width: '100%', marginTop: '1rem', backgroundColor: '#1e1e1e', borderCollapse: 'collapse' }}>
+            <thead style={{ backgroundColor: '#333', color: '#fff' }}>
+              <tr>
+                <th style={{ padding: '8px', border: '1px solid #555' }}>#</th>
+                <th style={{ padding: '8px', border: '1px solid #555' }}>Student ID</th>
+                <th style={{ padding: '8px', border: '1px solid #555' }}>Compile Status</th>
+                <th style={{ padding: '8px', border: '1px solid #555' }}>Run Status</th>
+                <th style={{ padding: '8px', border: '1px solid #555' }}>Compare Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.keys(project.students).map((id, index) => {
+                const r = results.find(res => res.studentId === id);
+                return (
+                  <tr key={id}>
+                    <td style={{ padding: '8px', border: '1px solid #444', textAlign: 'center' }}>{index + 1}</td>
+                    <td style={{ padding: '8px', border: '1px solid #444' }}>{id}</td>
+                    <td style={{ padding: '8px', border: '1px solid #444' }}>
+                      {r ? (r.error?.includes('gcc') || r.error?.includes('compile') ? 'Failure' : 'Success') : '-'}
+                    </td>
+                    <td style={{ padding: '8px', border: '1px solid #444' }}>
+                      {r ? (r.error?.includes('timeout') ? 'Timeout' : r.status === 'Success' ? 'Success' : 'Failure') : '-'}
+                    </td>
+                    <td style={{ padding: '8px', border: '1px solid #444' }}>
+                      {r ? (r.status === 'Success' ? 'Success' : 'Failure') : '-'}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
 
-                {result?.status === 'Failure' && (
-                  <div style={{ marginTop: "0.5rem", fontSize: "0.85rem", color: "#ccc" }}>
-                    {result.error && <div>❌ Error: {result.error}</div>}
-                    {result.actualOutput && <div>📤 Output: {result.actualOutput}</div>}
-                    <div>✅ Expected: {project.config?.outputFormat}</div>
-                  </div>
-                )}
-              </li>
-            );
-          })}
-        </ul>
+          <p style={{ marginTop: '1rem' }}>
+            ✅ {passedCount} of {totalCount} students passed
+          </p>
+        </>
       )}
 
       <div className="button-row" style={{ marginTop: "2rem" }}>
