@@ -1,337 +1,203 @@
-import { ipcMain, dialog, app, BrowserWindow } from "electron";
-import { createRequire } from "node:module";
-import { fileURLToPath } from "node:url";
-import path$1 from "node:path";
-import fs$4 from "fs";
-import require$$1 from "tty";
-import require$$1$1 from "util";
-import require$$0 from "os";
-import require$$0$1 from "buffer";
-import require$$6 from "stream";
-import require$$3 from "path";
-import require$$1$2 from "zlib";
-import require$$4 from "events";
-import { exec } from "child_process";
-function getDefaultExportFromCjs(x) {
-  return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, "default") ? x["default"] : x;
+import { app as $, ipcMain as P, dialog as lr, BrowserWindow as De } from "electron";
+import { fileURLToPath as hr } from "node:url";
+import b from "node:path";
+import w from "fs";
+import qe from "tty";
+import V from "util";
+import pr from "os";
+import We from "buffer";
+import U from "stream";
+import mr from "path";
+import xr from "zlib";
+import Ve from "events";
+import { exec as vr } from "child_process";
+function yr(e) {
+  return e && e.__esModule && Object.prototype.hasOwnProperty.call(e, "default") ? e.default : e;
 }
-var src = { exports: {} };
-var browser = { exports: {} };
-var ms;
-var hasRequiredMs;
-function requireMs() {
-  if (hasRequiredMs) return ms;
-  hasRequiredMs = 1;
-  var s = 1e3;
-  var m = s * 60;
-  var h = m * 60;
-  var d = h * 24;
-  var w = d * 7;
-  var y = d * 365.25;
-  ms = function(val, options) {
-    options = options || {};
-    var type = typeof val;
-    if (type === "string" && val.length > 0) {
-      return parse(val);
-    } else if (type === "number" && isFinite(val)) {
-      return options.long ? fmtLong(val) : fmtShort(val);
-    }
+var ve = { exports: {} }, X = { exports: {} }, he, _e;
+function gr() {
+  if (_e) return he;
+  _e = 1;
+  var e = 1e3, r = e * 60, n = r * 60, t = n * 24, i = t * 7, o = t * 365.25;
+  he = function(d, c) {
+    c = c || {};
+    var f = typeof d;
+    if (f === "string" && d.length > 0)
+      return s(d);
+    if (f === "number" && isFinite(d))
+      return c.long ? a(d) : u(d);
     throw new Error(
-      "val is not a non-empty string or a valid number. val=" + JSON.stringify(val)
+      "val is not a non-empty string or a valid number. val=" + JSON.stringify(d)
     );
   };
-  function parse(str) {
-    str = String(str);
-    if (str.length > 100) {
-      return;
-    }
-    var match = /^(-?(?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|w|years?|yrs?|y)?$/i.exec(
-      str
-    );
-    if (!match) {
-      return;
-    }
-    var n = parseFloat(match[1]);
-    var type = (match[2] || "ms").toLowerCase();
-    switch (type) {
-      case "years":
-      case "year":
-      case "yrs":
-      case "yr":
-      case "y":
-        return n * y;
-      case "weeks":
-      case "week":
-      case "w":
-        return n * w;
-      case "days":
-      case "day":
-      case "d":
-        return n * d;
-      case "hours":
-      case "hour":
-      case "hrs":
-      case "hr":
-      case "h":
-        return n * h;
-      case "minutes":
-      case "minute":
-      case "mins":
-      case "min":
-      case "m":
-        return n * m;
-      case "seconds":
-      case "second":
-      case "secs":
-      case "sec":
-      case "s":
-        return n * s;
-      case "milliseconds":
-      case "millisecond":
-      case "msecs":
-      case "msec":
-      case "ms":
-        return n;
-      default:
-        return void 0;
+  function s(d) {
+    if (d = String(d), !(d.length > 100)) {
+      var c = /^(-?(?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|w|years?|yrs?|y)?$/i.exec(
+        d
+      );
+      if (c) {
+        var f = parseFloat(c[1]), l = (c[2] || "ms").toLowerCase();
+        switch (l) {
+          case "years":
+          case "year":
+          case "yrs":
+          case "yr":
+          case "y":
+            return f * o;
+          case "weeks":
+          case "week":
+          case "w":
+            return f * i;
+          case "days":
+          case "day":
+          case "d":
+            return f * t;
+          case "hours":
+          case "hour":
+          case "hrs":
+          case "hr":
+          case "h":
+            return f * n;
+          case "minutes":
+          case "minute":
+          case "mins":
+          case "min":
+          case "m":
+            return f * r;
+          case "seconds":
+          case "second":
+          case "secs":
+          case "sec":
+          case "s":
+            return f * e;
+          case "milliseconds":
+          case "millisecond":
+          case "msecs":
+          case "msec":
+          case "ms":
+            return f;
+          default:
+            return;
+        }
+      }
     }
   }
-  function fmtShort(ms2) {
-    var msAbs = Math.abs(ms2);
-    if (msAbs >= d) {
-      return Math.round(ms2 / d) + "d";
-    }
-    if (msAbs >= h) {
-      return Math.round(ms2 / h) + "h";
-    }
-    if (msAbs >= m) {
-      return Math.round(ms2 / m) + "m";
-    }
-    if (msAbs >= s) {
-      return Math.round(ms2 / s) + "s";
-    }
-    return ms2 + "ms";
+  function u(d) {
+    var c = Math.abs(d);
+    return c >= t ? Math.round(d / t) + "d" : c >= n ? Math.round(d / n) + "h" : c >= r ? Math.round(d / r) + "m" : c >= e ? Math.round(d / e) + "s" : d + "ms";
   }
-  function fmtLong(ms2) {
-    var msAbs = Math.abs(ms2);
-    if (msAbs >= d) {
-      return plural(ms2, msAbs, d, "day");
-    }
-    if (msAbs >= h) {
-      return plural(ms2, msAbs, h, "hour");
-    }
-    if (msAbs >= m) {
-      return plural(ms2, msAbs, m, "minute");
-    }
-    if (msAbs >= s) {
-      return plural(ms2, msAbs, s, "second");
-    }
-    return ms2 + " ms";
+  function a(d) {
+    var c = Math.abs(d);
+    return c >= t ? h(d, c, t, "day") : c >= n ? h(d, c, n, "hour") : c >= r ? h(d, c, r, "minute") : c >= e ? h(d, c, e, "second") : d + " ms";
   }
-  function plural(ms2, msAbs, n, name) {
-    var isPlural = msAbs >= n * 1.5;
-    return Math.round(ms2 / n) + " " + name + (isPlural ? "s" : "");
+  function h(d, c, f, l) {
+    var m = c >= f * 1.5;
+    return Math.round(d / f) + " " + l + (m ? "s" : "");
   }
-  return ms;
+  return he;
 }
-var common;
-var hasRequiredCommon;
-function requireCommon() {
-  if (hasRequiredCommon) return common;
-  hasRequiredCommon = 1;
-  function setup(env) {
-    createDebug.debug = createDebug;
-    createDebug.default = createDebug;
-    createDebug.coerce = coerce;
-    createDebug.disable = disable;
-    createDebug.enable = enable;
-    createDebug.enabled = enabled;
-    createDebug.humanize = requireMs();
-    createDebug.destroy = destroy;
-    Object.keys(env).forEach((key) => {
-      createDebug[key] = env[key];
-    });
-    createDebug.names = [];
-    createDebug.skips = [];
-    createDebug.formatters = {};
-    function selectColor(namespace) {
-      let hash = 0;
-      for (let i = 0; i < namespace.length; i++) {
-        hash = (hash << 5) - hash + namespace.charCodeAt(i);
-        hash |= 0;
-      }
-      return createDebug.colors[Math.abs(hash) % createDebug.colors.length];
+var pe, Ae;
+function Ge() {
+  if (Ae) return pe;
+  Ae = 1;
+  function e(r) {
+    t.debug = t, t.default = t, t.coerce = h, t.disable = u, t.enable = o, t.enabled = a, t.humanize = gr(), t.destroy = d, Object.keys(r).forEach((c) => {
+      t[c] = r[c];
+    }), t.names = [], t.skips = [], t.formatters = {};
+    function n(c) {
+      let f = 0;
+      for (let l = 0; l < c.length; l++)
+        f = (f << 5) - f + c.charCodeAt(l), f |= 0;
+      return t.colors[Math.abs(f) % t.colors.length];
     }
-    createDebug.selectColor = selectColor;
-    function createDebug(namespace) {
-      let prevTime;
-      let enableOverride = null;
-      let namespacesCache;
-      let enabledCache;
-      function debug2(...args) {
-        if (!debug2.enabled) {
+    t.selectColor = n;
+    function t(c) {
+      let f, l = null, m, x;
+      function p(...v) {
+        if (!p.enabled)
           return;
-        }
-        const self = debug2;
-        const curr = Number(/* @__PURE__ */ new Date());
-        const ms2 = curr - (prevTime || curr);
-        self.diff = ms2;
-        self.prev = prevTime;
-        self.curr = curr;
-        prevTime = curr;
-        args[0] = createDebug.coerce(args[0]);
-        if (typeof args[0] !== "string") {
-          args.unshift("%O");
-        }
-        let index = 0;
-        args[0] = args[0].replace(/%([a-zA-Z%])/g, (match, format) => {
-          if (match === "%%") {
+        const y = p, g = Number(/* @__PURE__ */ new Date()), q = g - (f || g);
+        y.diff = q, y.prev = f, y.curr = g, f = g, v[0] = t.coerce(v[0]), typeof v[0] != "string" && v.unshift("%O");
+        let F = 0;
+        v[0] = v[0].replace(/%([a-zA-Z%])/g, (O, J) => {
+          if (O === "%%")
             return "%";
+          F++;
+          const Re = t.formatters[J];
+          if (typeof Re == "function") {
+            const dr = v[F];
+            O = Re.call(y, dr), v.splice(F, 1), F--;
           }
-          index++;
-          const formatter = createDebug.formatters[format];
-          if (typeof formatter === "function") {
-            const val = args[index];
-            match = formatter.call(self, val);
-            args.splice(index, 1);
-            index--;
-          }
-          return match;
-        });
-        createDebug.formatArgs.call(self, args);
-        const logFn = self.log || createDebug.log;
-        logFn.apply(self, args);
+          return O;
+        }), t.formatArgs.call(y, v), (y.log || t.log).apply(y, v);
       }
-      debug2.namespace = namespace;
-      debug2.useColors = createDebug.useColors();
-      debug2.color = createDebug.selectColor(namespace);
-      debug2.extend = extend;
-      debug2.destroy = createDebug.destroy;
-      Object.defineProperty(debug2, "enabled", {
-        enumerable: true,
-        configurable: false,
-        get: () => {
-          if (enableOverride !== null) {
-            return enableOverride;
-          }
-          if (namespacesCache !== createDebug.namespaces) {
-            namespacesCache = createDebug.namespaces;
-            enabledCache = createDebug.enabled(namespace);
-          }
-          return enabledCache;
-        },
+      return p.namespace = c, p.useColors = t.useColors(), p.color = t.selectColor(c), p.extend = i, p.destroy = t.destroy, Object.defineProperty(p, "enabled", {
+        enumerable: !0,
+        configurable: !1,
+        get: () => l !== null ? l : (m !== t.namespaces && (m = t.namespaces, x = t.enabled(c)), x),
         set: (v) => {
-          enableOverride = v;
+          l = v;
         }
-      });
-      if (typeof createDebug.init === "function") {
-        createDebug.init(debug2);
-      }
-      return debug2;
+      }), typeof t.init == "function" && t.init(p), p;
     }
-    function extend(namespace, delimiter) {
-      const newDebug = createDebug(this.namespace + (typeof delimiter === "undefined" ? ":" : delimiter) + namespace);
-      newDebug.log = this.log;
-      return newDebug;
+    function i(c, f) {
+      const l = t(this.namespace + (typeof f > "u" ? ":" : f) + c);
+      return l.log = this.log, l;
     }
-    function enable(namespaces) {
-      createDebug.save(namespaces);
-      createDebug.namespaces = namespaces;
-      createDebug.names = [];
-      createDebug.skips = [];
-      const split = (typeof namespaces === "string" ? namespaces : "").trim().replace(" ", ",").split(",").filter(Boolean);
-      for (const ns of split) {
-        if (ns[0] === "-") {
-          createDebug.skips.push(ns.slice(1));
-        } else {
-          createDebug.names.push(ns);
-        }
-      }
+    function o(c) {
+      t.save(c), t.namespaces = c, t.names = [], t.skips = [];
+      const f = (typeof c == "string" ? c : "").trim().replace(" ", ",").split(",").filter(Boolean);
+      for (const l of f)
+        l[0] === "-" ? t.skips.push(l.slice(1)) : t.names.push(l);
     }
-    function matchesTemplate(search, template) {
-      let searchIndex = 0;
-      let templateIndex = 0;
-      let starIndex = -1;
-      let matchIndex = 0;
-      while (searchIndex < search.length) {
-        if (templateIndex < template.length && (template[templateIndex] === search[searchIndex] || template[templateIndex] === "*")) {
-          if (template[templateIndex] === "*") {
-            starIndex = templateIndex;
-            matchIndex = searchIndex;
-            templateIndex++;
-          } else {
-            searchIndex++;
-            templateIndex++;
-          }
-        } else if (starIndex !== -1) {
-          templateIndex = starIndex + 1;
-          matchIndex++;
-          searchIndex = matchIndex;
-        } else {
-          return false;
-        }
-      }
-      while (templateIndex < template.length && template[templateIndex] === "*") {
-        templateIndex++;
-      }
-      return templateIndex === template.length;
+    function s(c, f) {
+      let l = 0, m = 0, x = -1, p = 0;
+      for (; l < c.length; )
+        if (m < f.length && (f[m] === c[l] || f[m] === "*"))
+          f[m] === "*" ? (x = m, p = l, m++) : (l++, m++);
+        else if (x !== -1)
+          m = x + 1, p++, l = p;
+        else
+          return !1;
+      for (; m < f.length && f[m] === "*"; )
+        m++;
+      return m === f.length;
     }
-    function disable() {
-      const namespaces = [
-        ...createDebug.names,
-        ...createDebug.skips.map((namespace) => "-" + namespace)
+    function u() {
+      const c = [
+        ...t.names,
+        ...t.skips.map((f) => "-" + f)
       ].join(",");
-      createDebug.enable("");
-      return namespaces;
+      return t.enable(""), c;
     }
-    function enabled(name) {
-      for (const skip of createDebug.skips) {
-        if (matchesTemplate(name, skip)) {
-          return false;
-        }
-      }
-      for (const ns of createDebug.names) {
-        if (matchesTemplate(name, ns)) {
-          return true;
-        }
-      }
-      return false;
+    function a(c) {
+      for (const f of t.skips)
+        if (s(c, f))
+          return !1;
+      for (const f of t.names)
+        if (s(c, f))
+          return !0;
+      return !1;
     }
-    function coerce(val) {
-      if (val instanceof Error) {
-        return val.stack || val.message;
-      }
-      return val;
+    function h(c) {
+      return c instanceof Error ? c.stack || c.message : c;
     }
-    function destroy() {
+    function d() {
       console.warn("Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`.");
     }
-    createDebug.enable(createDebug.load());
-    return createDebug;
+    return t.enable(t.load()), t;
   }
-  common = setup;
-  return common;
+  return pe = e, pe;
 }
-var hasRequiredBrowser;
-function requireBrowser() {
-  if (hasRequiredBrowser) return browser.exports;
-  hasRequiredBrowser = 1;
-  (function(module, exports) {
-    exports.formatArgs = formatArgs;
-    exports.save = save;
-    exports.load = load;
-    exports.useColors = useColors;
-    exports.storage = localstorage();
-    exports.destroy = /* @__PURE__ */ (() => {
-      let warned = false;
+var Te;
+function br() {
+  return Te || (Te = 1, function(e, r) {
+    r.formatArgs = t, r.save = i, r.load = o, r.useColors = n, r.storage = s(), r.destroy = /* @__PURE__ */ (() => {
+      let a = !1;
       return () => {
-        if (!warned) {
-          warned = true;
-          console.warn("Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`.");
-        }
+        a || (a = !0, console.warn("Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`."));
       };
-    })();
-    exports.colors = [
+    })(), r.colors = [
       "#0000CC",
       "#0000FF",
       "#0033CC",
@@ -409,980 +275,625 @@ function requireBrowser() {
       "#FFCC00",
       "#FFCC33"
     ];
-    function useColors() {
-      if (typeof window !== "undefined" && window.process && (window.process.type === "renderer" || window.process.__nwjs)) {
-        return true;
-      }
-      if (typeof navigator !== "undefined" && navigator.userAgent && navigator.userAgent.toLowerCase().match(/(edge|trident)\/(\d+)/)) {
-        return false;
-      }
-      let m;
-      return typeof document !== "undefined" && document.documentElement && document.documentElement.style && document.documentElement.style.WebkitAppearance || // Is firebug? http://stackoverflow.com/a/398120/376773
-      typeof window !== "undefined" && window.console && (window.console.firebug || window.console.exception && window.console.table) || // Is firefox >= v31?
+    function n() {
+      if (typeof window < "u" && window.process && (window.process.type === "renderer" || window.process.__nwjs))
+        return !0;
+      if (typeof navigator < "u" && navigator.userAgent && navigator.userAgent.toLowerCase().match(/(edge|trident)\/(\d+)/))
+        return !1;
+      let a;
+      return typeof document < "u" && document.documentElement && document.documentElement.style && document.documentElement.style.WebkitAppearance || // Is firebug? http://stackoverflow.com/a/398120/376773
+      typeof window < "u" && window.console && (window.console.firebug || window.console.exception && window.console.table) || // Is firefox >= v31?
       // https://developer.mozilla.org/en-US/docs/Tools/Web_Console#Styling_messages
-      typeof navigator !== "undefined" && navigator.userAgent && (m = navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/)) && parseInt(m[1], 10) >= 31 || // Double check webkit in userAgent just in case we are in a worker
-      typeof navigator !== "undefined" && navigator.userAgent && navigator.userAgent.toLowerCase().match(/applewebkit\/(\d+)/);
+      typeof navigator < "u" && navigator.userAgent && (a = navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/)) && parseInt(a[1], 10) >= 31 || // Double check webkit in userAgent just in case we are in a worker
+      typeof navigator < "u" && navigator.userAgent && navigator.userAgent.toLowerCase().match(/applewebkit\/(\d+)/);
     }
-    function formatArgs(args) {
-      args[0] = (this.useColors ? "%c" : "") + this.namespace + (this.useColors ? " %c" : " ") + args[0] + (this.useColors ? "%c " : " ") + "+" + module.exports.humanize(this.diff);
-      if (!this.useColors) {
+    function t(a) {
+      if (a[0] = (this.useColors ? "%c" : "") + this.namespace + (this.useColors ? " %c" : " ") + a[0] + (this.useColors ? "%c " : " ") + "+" + e.exports.humanize(this.diff), !this.useColors)
         return;
-      }
-      const c = "color: " + this.color;
-      args.splice(1, 0, c, "color: inherit");
-      let index = 0;
-      let lastC = 0;
-      args[0].replace(/%[a-zA-Z%]/g, (match) => {
-        if (match === "%%") {
-          return;
-        }
-        index++;
-        if (match === "%c") {
-          lastC = index;
-        }
-      });
-      args.splice(lastC, 0, c);
+      const h = "color: " + this.color;
+      a.splice(1, 0, h, "color: inherit");
+      let d = 0, c = 0;
+      a[0].replace(/%[a-zA-Z%]/g, (f) => {
+        f !== "%%" && (d++, f === "%c" && (c = d));
+      }), a.splice(c, 0, h);
     }
-    exports.log = console.debug || console.log || (() => {
+    r.log = console.debug || console.log || (() => {
     });
-    function save(namespaces) {
+    function i(a) {
       try {
-        if (namespaces) {
-          exports.storage.setItem("debug", namespaces);
-        } else {
-          exports.storage.removeItem("debug");
-        }
-      } catch (error) {
+        a ? r.storage.setItem("debug", a) : r.storage.removeItem("debug");
+      } catch {
       }
     }
-    function load() {
-      let r;
+    function o() {
+      let a;
       try {
-        r = exports.storage.getItem("debug");
-      } catch (error) {
+        a = r.storage.getItem("debug");
+      } catch {
       }
-      if (!r && typeof process !== "undefined" && "env" in process) {
-        r = process.env.DEBUG;
-      }
-      return r;
+      return !a && typeof process < "u" && "env" in process && (a = process.env.DEBUG), a;
     }
-    function localstorage() {
+    function s() {
       try {
         return localStorage;
-      } catch (error) {
+      } catch {
       }
     }
-    module.exports = requireCommon()(exports);
-    const { formatters } = module.exports;
-    formatters.j = function(v) {
+    e.exports = Ge()(r);
+    const { formatters: u } = e.exports;
+    u.j = function(a) {
       try {
-        return JSON.stringify(v);
-      } catch (error) {
-        return "[UnexpectedJSONParseError]: " + error.message;
+        return JSON.stringify(a);
+      } catch (h) {
+        return "[UnexpectedJSONParseError]: " + h.message;
       }
     };
-  })(browser, browser.exports);
-  return browser.exports;
+  }(X, X.exports)), X.exports;
 }
-var node = { exports: {} };
-var hasFlag;
-var hasRequiredHasFlag;
-function requireHasFlag() {
-  if (hasRequiredHasFlag) return hasFlag;
-  hasRequiredHasFlag = 1;
-  hasFlag = (flag, argv = process.argv) => {
-    const prefix = flag.startsWith("-") ? "" : flag.length === 1 ? "-" : "--";
-    const position = argv.indexOf(prefix + flag);
-    const terminatorPosition = argv.indexOf("--");
-    return position !== -1 && (terminatorPosition === -1 || position < terminatorPosition);
-  };
-  return hasFlag;
+var K = { exports: {} }, me, Me;
+function wr() {
+  return Me || (Me = 1, me = (e, r = process.argv) => {
+    const n = e.startsWith("-") ? "" : e.length === 1 ? "-" : "--", t = r.indexOf(n + e), i = r.indexOf("--");
+    return t !== -1 && (i === -1 || t < i);
+  }), me;
 }
-var supportsColor_1;
-var hasRequiredSupportsColor;
-function requireSupportsColor() {
-  if (hasRequiredSupportsColor) return supportsColor_1;
-  hasRequiredSupportsColor = 1;
-  const os = require$$0;
-  const tty = require$$1;
-  const hasFlag2 = requireHasFlag();
-  const { env } = process;
-  let forceColor;
-  if (hasFlag2("no-color") || hasFlag2("no-colors") || hasFlag2("color=false") || hasFlag2("color=never")) {
-    forceColor = 0;
-  } else if (hasFlag2("color") || hasFlag2("colors") || hasFlag2("color=true") || hasFlag2("color=always")) {
-    forceColor = 1;
-  }
-  if ("FORCE_COLOR" in env) {
-    if (env.FORCE_COLOR === "true") {
-      forceColor = 1;
-    } else if (env.FORCE_COLOR === "false") {
-      forceColor = 0;
-    } else {
-      forceColor = env.FORCE_COLOR.length === 0 ? 1 : Math.min(parseInt(env.FORCE_COLOR, 10), 3);
-    }
-  }
-  function translateLevel(level) {
-    if (level === 0) {
-      return false;
-    }
-    return {
-      level,
-      hasBasic: true,
-      has256: level >= 2,
-      has16m: level >= 3
+var xe, Pe;
+function Cr() {
+  if (Pe) return xe;
+  Pe = 1;
+  const e = pr, r = qe, n = wr(), { env: t } = process;
+  let i;
+  n("no-color") || n("no-colors") || n("color=false") || n("color=never") ? i = 0 : (n("color") || n("colors") || n("color=true") || n("color=always")) && (i = 1), "FORCE_COLOR" in t && (t.FORCE_COLOR === "true" ? i = 1 : t.FORCE_COLOR === "false" ? i = 0 : i = t.FORCE_COLOR.length === 0 ? 1 : Math.min(parseInt(t.FORCE_COLOR, 10), 3));
+  function o(a) {
+    return a === 0 ? !1 : {
+      level: a,
+      hasBasic: !0,
+      has256: a >= 2,
+      has16m: a >= 3
     };
   }
-  function supportsColor(haveStream, streamIsTTY) {
-    if (forceColor === 0) {
+  function s(a, h) {
+    if (i === 0)
       return 0;
-    }
-    if (hasFlag2("color=16m") || hasFlag2("color=full") || hasFlag2("color=truecolor")) {
+    if (n("color=16m") || n("color=full") || n("color=truecolor"))
       return 3;
-    }
-    if (hasFlag2("color=256")) {
+    if (n("color=256"))
       return 2;
-    }
-    if (haveStream && !streamIsTTY && forceColor === void 0) {
+    if (a && !h && i === void 0)
       return 0;
-    }
-    const min = forceColor || 0;
-    if (env.TERM === "dumb") {
-      return min;
-    }
+    const d = i || 0;
+    if (t.TERM === "dumb")
+      return d;
     if (process.platform === "win32") {
-      const osRelease = os.release().split(".");
-      if (Number(osRelease[0]) >= 10 && Number(osRelease[2]) >= 10586) {
-        return Number(osRelease[2]) >= 14931 ? 3 : 2;
-      }
-      return 1;
+      const c = e.release().split(".");
+      return Number(c[0]) >= 10 && Number(c[2]) >= 10586 ? Number(c[2]) >= 14931 ? 3 : 2 : 1;
     }
-    if ("CI" in env) {
-      if (["TRAVIS", "CIRCLECI", "APPVEYOR", "GITLAB_CI", "GITHUB_ACTIONS", "BUILDKITE"].some((sign) => sign in env) || env.CI_NAME === "codeship") {
-        return 1;
-      }
-      return min;
-    }
-    if ("TEAMCITY_VERSION" in env) {
-      return /^(9\.(0*[1-9]\d*)\.|\d{2,}\.)/.test(env.TEAMCITY_VERSION) ? 1 : 0;
-    }
-    if (env.COLORTERM === "truecolor") {
+    if ("CI" in t)
+      return ["TRAVIS", "CIRCLECI", "APPVEYOR", "GITLAB_CI", "GITHUB_ACTIONS", "BUILDKITE"].some((c) => c in t) || t.CI_NAME === "codeship" ? 1 : d;
+    if ("TEAMCITY_VERSION" in t)
+      return /^(9\.(0*[1-9]\d*)\.|\d{2,}\.)/.test(t.TEAMCITY_VERSION) ? 1 : 0;
+    if (t.COLORTERM === "truecolor")
       return 3;
-    }
-    if ("TERM_PROGRAM" in env) {
-      const version = parseInt((env.TERM_PROGRAM_VERSION || "").split(".")[0], 10);
-      switch (env.TERM_PROGRAM) {
+    if ("TERM_PROGRAM" in t) {
+      const c = parseInt((t.TERM_PROGRAM_VERSION || "").split(".")[0], 10);
+      switch (t.TERM_PROGRAM) {
         case "iTerm.app":
-          return version >= 3 ? 3 : 2;
+          return c >= 3 ? 3 : 2;
         case "Apple_Terminal":
           return 2;
       }
     }
-    if (/-256(color)?$/i.test(env.TERM)) {
-      return 2;
-    }
-    if (/^screen|^xterm|^vt100|^vt220|^rxvt|color|ansi|cygwin|linux/i.test(env.TERM)) {
-      return 1;
-    }
-    if ("COLORTERM" in env) {
-      return 1;
-    }
-    return min;
+    return /-256(color)?$/i.test(t.TERM) ? 2 : /^screen|^xterm|^vt100|^vt220|^rxvt|color|ansi|cygwin|linux/i.test(t.TERM) || "COLORTERM" in t ? 1 : d;
   }
-  function getSupportLevel(stream2) {
-    const level = supportsColor(stream2, stream2 && stream2.isTTY);
-    return translateLevel(level);
+  function u(a) {
+    const h = s(a, a && a.isTTY);
+    return o(h);
   }
-  supportsColor_1 = {
-    supportsColor: getSupportLevel,
-    stdout: translateLevel(supportsColor(true, tty.isatty(1))),
-    stderr: translateLevel(supportsColor(true, tty.isatty(2)))
-  };
-  return supportsColor_1;
+  return xe = {
+    supportsColor: u,
+    stdout: o(s(!0, r.isatty(1))),
+    stderr: o(s(!0, r.isatty(2)))
+  }, xe;
 }
-var hasRequiredNode;
-function requireNode() {
-  if (hasRequiredNode) return node.exports;
-  hasRequiredNode = 1;
-  (function(module, exports) {
-    const tty = require$$1;
-    const util2 = require$$1$1;
-    exports.init = init;
-    exports.log = log;
-    exports.formatArgs = formatArgs;
-    exports.save = save;
-    exports.load = load;
-    exports.useColors = useColors;
-    exports.destroy = util2.deprecate(
+var Ne;
+function Er() {
+  return Ne || (Ne = 1, function(e, r) {
+    const n = qe, t = V;
+    r.init = d, r.log = u, r.formatArgs = o, r.save = a, r.load = h, r.useColors = i, r.destroy = t.deprecate(
       () => {
       },
       "Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`."
-    );
-    exports.colors = [6, 2, 3, 4, 5, 1];
+    ), r.colors = [6, 2, 3, 4, 5, 1];
     try {
-      const supportsColor = requireSupportsColor();
-      if (supportsColor && (supportsColor.stderr || supportsColor).level >= 2) {
-        exports.colors = [
-          20,
-          21,
-          26,
-          27,
-          32,
-          33,
-          38,
-          39,
-          40,
-          41,
-          42,
-          43,
-          44,
-          45,
-          56,
-          57,
-          62,
-          63,
-          68,
-          69,
-          74,
-          75,
-          76,
-          77,
-          78,
-          79,
-          80,
-          81,
-          92,
-          93,
-          98,
-          99,
-          112,
-          113,
-          128,
-          129,
-          134,
-          135,
-          148,
-          149,
-          160,
-          161,
-          162,
-          163,
-          164,
-          165,
-          166,
-          167,
-          168,
-          169,
-          170,
-          171,
-          172,
-          173,
-          178,
-          179,
-          184,
-          185,
-          196,
-          197,
-          198,
-          199,
-          200,
-          201,
-          202,
-          203,
-          204,
-          205,
-          206,
-          207,
-          208,
-          209,
-          214,
-          215,
-          220,
-          221
-        ];
-      }
-    } catch (error) {
+      const f = Cr();
+      f && (f.stderr || f).level >= 2 && (r.colors = [
+        20,
+        21,
+        26,
+        27,
+        32,
+        33,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        56,
+        57,
+        62,
+        63,
+        68,
+        69,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        92,
+        93,
+        98,
+        99,
+        112,
+        113,
+        128,
+        129,
+        134,
+        135,
+        148,
+        149,
+        160,
+        161,
+        162,
+        163,
+        164,
+        165,
+        166,
+        167,
+        168,
+        169,
+        170,
+        171,
+        172,
+        173,
+        178,
+        179,
+        184,
+        185,
+        196,
+        197,
+        198,
+        199,
+        200,
+        201,
+        202,
+        203,
+        204,
+        205,
+        206,
+        207,
+        208,
+        209,
+        214,
+        215,
+        220,
+        221
+      ]);
+    } catch {
     }
-    exports.inspectOpts = Object.keys(process.env).filter((key) => {
-      return /^debug_/i.test(key);
-    }).reduce((obj, key) => {
-      const prop = key.substring(6).toLowerCase().replace(/_([a-z])/g, (_, k) => {
-        return k.toUpperCase();
-      });
-      let val = process.env[key];
-      if (/^(yes|on|true|enabled)$/i.test(val)) {
-        val = true;
-      } else if (/^(no|off|false|disabled)$/i.test(val)) {
-        val = false;
-      } else if (val === "null") {
-        val = null;
-      } else {
-        val = Number(val);
-      }
-      obj[prop] = val;
-      return obj;
+    r.inspectOpts = Object.keys(process.env).filter((f) => /^debug_/i.test(f)).reduce((f, l) => {
+      const m = l.substring(6).toLowerCase().replace(/_([a-z])/g, (p, v) => v.toUpperCase());
+      let x = process.env[l];
+      return /^(yes|on|true|enabled)$/i.test(x) ? x = !0 : /^(no|off|false|disabled)$/i.test(x) ? x = !1 : x === "null" ? x = null : x = Number(x), f[m] = x, f;
     }, {});
-    function useColors() {
-      return "colors" in exports.inspectOpts ? Boolean(exports.inspectOpts.colors) : tty.isatty(process.stderr.fd);
+    function i() {
+      return "colors" in r.inspectOpts ? !!r.inspectOpts.colors : n.isatty(process.stderr.fd);
     }
-    function formatArgs(args) {
-      const { namespace: name, useColors: useColors2 } = this;
-      if (useColors2) {
-        const c = this.color;
-        const colorCode = "\x1B[3" + (c < 8 ? c : "8;5;" + c);
-        const prefix = `  ${colorCode};1m${name} \x1B[0m`;
-        args[0] = prefix + args[0].split("\n").join("\n" + prefix);
-        args.push(colorCode + "m+" + module.exports.humanize(this.diff) + "\x1B[0m");
-      } else {
-        args[0] = getDate() + name + " " + args[0];
-      }
+    function o(f) {
+      const { namespace: l, useColors: m } = this;
+      if (m) {
+        const x = this.color, p = "\x1B[3" + (x < 8 ? x : "8;5;" + x), v = `  ${p};1m${l} \x1B[0m`;
+        f[0] = v + f[0].split(`
+`).join(`
+` + v), f.push(p + "m+" + e.exports.humanize(this.diff) + "\x1B[0m");
+      } else
+        f[0] = s() + l + " " + f[0];
     }
-    function getDate() {
-      if (exports.inspectOpts.hideDate) {
-        return "";
-      }
-      return (/* @__PURE__ */ new Date()).toISOString() + " ";
+    function s() {
+      return r.inspectOpts.hideDate ? "" : (/* @__PURE__ */ new Date()).toISOString() + " ";
     }
-    function log(...args) {
-      return process.stderr.write(util2.formatWithOptions(exports.inspectOpts, ...args) + "\n");
+    function u(...f) {
+      return process.stderr.write(t.formatWithOptions(r.inspectOpts, ...f) + `
+`);
     }
-    function save(namespaces) {
-      if (namespaces) {
-        process.env.DEBUG = namespaces;
-      } else {
-        delete process.env.DEBUG;
-      }
+    function a(f) {
+      f ? process.env.DEBUG = f : delete process.env.DEBUG;
     }
-    function load() {
+    function h() {
       return process.env.DEBUG;
     }
-    function init(debug2) {
-      debug2.inspectOpts = {};
-      const keys = Object.keys(exports.inspectOpts);
-      for (let i = 0; i < keys.length; i++) {
-        debug2.inspectOpts[keys[i]] = exports.inspectOpts[keys[i]];
-      }
+    function d(f) {
+      f.inspectOpts = {};
+      const l = Object.keys(r.inspectOpts);
+      for (let m = 0; m < l.length; m++)
+        f.inspectOpts[l[m]] = r.inspectOpts[l[m]];
     }
-    module.exports = requireCommon()(exports);
-    const { formatters } = module.exports;
-    formatters.o = function(v) {
-      this.inspectOpts.colors = this.useColors;
-      return util2.inspect(v, this.inspectOpts).split("\n").map((str) => str.trim()).join(" ");
+    e.exports = Ge()(r);
+    const { formatters: c } = e.exports;
+    c.o = function(f) {
+      return this.inspectOpts.colors = this.useColors, t.inspect(f, this.inspectOpts).split(`
+`).map((l) => l.trim()).join(" ");
+    }, c.O = function(f) {
+      return this.inspectOpts.colors = this.useColors, t.inspect(f, this.inspectOpts);
     };
-    formatters.O = function(v) {
-      this.inspectOpts.colors = this.useColors;
-      return util2.inspect(v, this.inspectOpts);
-    };
-  })(node, node.exports);
-  return node.exports;
+  }(K, K.exports)), K.exports;
 }
-if (typeof process === "undefined" || process.type === "renderer" || process.browser === true || process.__nwjs) {
-  src.exports = requireBrowser();
-} else {
-  src.exports = requireNode();
-}
-var srcExports = src.exports;
-var getStream$2 = { exports: {} };
-var once$3 = { exports: {} };
-var wrappy_1 = wrappy$1;
-function wrappy$1(fn, cb) {
-  if (fn && cb) return wrappy$1(fn)(cb);
-  if (typeof fn !== "function")
+typeof process > "u" || process.type === "renderer" || process.browser === !0 || process.__nwjs ? ve.exports = br() : ve.exports = Er();
+var Fr = ve.exports, D = { exports: {} }, we = { exports: {} }, Sr = He;
+function He(e, r) {
+  if (e && r) return He(e)(r);
+  if (typeof e != "function")
     throw new TypeError("need wrapper function");
-  Object.keys(fn).forEach(function(k) {
-    wrapper[k] = fn[k];
-  });
-  return wrapper;
-  function wrapper() {
-    var args = new Array(arguments.length);
-    for (var i = 0; i < args.length; i++) {
-      args[i] = arguments[i];
-    }
-    var ret = fn.apply(this, args);
-    var cb2 = args[args.length - 1];
-    if (typeof ret === "function" && ret !== cb2) {
-      Object.keys(cb2).forEach(function(k) {
-        ret[k] = cb2[k];
-      });
-    }
-    return ret;
+  return Object.keys(e).forEach(function(t) {
+    n[t] = e[t];
+  }), n;
+  function n() {
+    for (var t = new Array(arguments.length), i = 0; i < t.length; i++)
+      t[i] = arguments[i];
+    var o = e.apply(this, t), s = t[t.length - 1];
+    return typeof o == "function" && o !== s && Object.keys(s).forEach(function(u) {
+      o[u] = s[u];
+    }), o;
   }
 }
-var wrappy = wrappy_1;
-once$3.exports = wrappy(once$2);
-once$3.exports.strict = wrappy(onceStrict);
-once$2.proto = once$2(function() {
+var Ze = Sr;
+we.exports = Ze(k);
+we.exports.strict = Ze(Ye);
+k.proto = k(function() {
   Object.defineProperty(Function.prototype, "once", {
     value: function() {
-      return once$2(this);
+      return k(this);
     },
-    configurable: true
-  });
-  Object.defineProperty(Function.prototype, "onceStrict", {
+    configurable: !0
+  }), Object.defineProperty(Function.prototype, "onceStrict", {
     value: function() {
-      return onceStrict(this);
+      return Ye(this);
     },
-    configurable: true
+    configurable: !0
   });
 });
-function once$2(fn) {
-  var f = function() {
-    if (f.called) return f.value;
-    f.called = true;
-    return f.value = fn.apply(this, arguments);
+function k(e) {
+  var r = function() {
+    return r.called ? r.value : (r.called = !0, r.value = e.apply(this, arguments));
   };
-  f.called = false;
-  return f;
+  return r.called = !1, r;
 }
-function onceStrict(fn) {
-  var f = function() {
-    if (f.called)
-      throw new Error(f.onceError);
-    f.called = true;
-    return f.value = fn.apply(this, arguments);
-  };
-  var name = fn.name || "Function wrapped with `once`";
-  f.onceError = name + " shouldn't be called more than once";
-  f.called = false;
-  return f;
+function Ye(e) {
+  var r = function() {
+    if (r.called)
+      throw new Error(r.onceError);
+    return r.called = !0, r.value = e.apply(this, arguments);
+  }, n = e.name || "Function wrapped with `once`";
+  return r.onceError = n + " shouldn't be called more than once", r.called = !1, r;
 }
-var onceExports = once$3.exports;
-var once$1 = onceExports;
-var noop$1 = function() {
-};
-var isRequest$1 = function(stream2) {
-  return stream2.setHeader && typeof stream2.abort === "function";
-};
-var isChildProcess = function(stream2) {
-  return stream2.stdio && Array.isArray(stream2.stdio) && stream2.stdio.length === 3;
-};
-var eos$1 = function(stream2, opts, callback) {
-  if (typeof opts === "function") return eos$1(stream2, null, opts);
-  if (!opts) opts = {};
-  callback = once$1(callback || noop$1);
-  var ws = stream2._writableState;
-  var rs = stream2._readableState;
-  var readable = opts.readable || opts.readable !== false && stream2.readable;
-  var writable = opts.writable || opts.writable !== false && stream2.writable;
-  var cancelled = false;
-  var onlegacyfinish = function() {
-    if (!stream2.writable) onfinish();
+var Je = we.exports, Ir = Je, Or = function() {
+}, Lr = function(e) {
+  return e.setHeader && typeof e.abort == "function";
+}, zr = function(e) {
+  return e.stdio && Array.isArray(e.stdio) && e.stdio.length === 3;
+}, Xe = function(e, r, n) {
+  if (typeof r == "function") return Xe(e, null, r);
+  r || (r = {}), n = Ir(n || Or);
+  var t = e._writableState, i = e._readableState, o = r.readable || r.readable !== !1 && e.readable, s = r.writable || r.writable !== !1 && e.writable, u = !1, a = function() {
+    e.writable || h();
+  }, h = function() {
+    s = !1, o || n.call(e);
+  }, d = function() {
+    o = !1, s || n.call(e);
+  }, c = function(p) {
+    n.call(e, p ? new Error("exited with error code: " + p) : null);
+  }, f = function(p) {
+    n.call(e, p);
+  }, l = function() {
+    process.nextTick(m);
+  }, m = function() {
+    if (!u) {
+      if (o && !(i && i.ended && !i.destroyed)) return n.call(e, new Error("premature close"));
+      if (s && !(t && t.ended && !t.destroyed)) return n.call(e, new Error("premature close"));
+    }
+  }, x = function() {
+    e.req.on("finish", h);
   };
-  var onfinish = function() {
-    writable = false;
-    if (!readable) callback.call(stream2);
+  return Lr(e) ? (e.on("complete", h), e.on("abort", l), e.req ? x() : e.on("request", x)) : s && !t && (e.on("end", a), e.on("close", a)), zr(e) && e.on("exit", c), e.on("end", d), e.on("finish", h), r.error !== !1 && e.on("error", f), e.on("close", l), function() {
+    u = !0, e.removeListener("complete", h), e.removeListener("abort", l), e.removeListener("request", x), e.req && e.req.removeListener("finish", h), e.removeListener("end", a), e.removeListener("close", a), e.removeListener("finish", h), e.removeListener("exit", c), e.removeListener("end", d), e.removeListener("error", f), e.removeListener("close", l);
   };
-  var onend = function() {
-    readable = false;
-    if (!writable) callback.call(stream2);
-  };
-  var onexit = function(exitCode) {
-    callback.call(stream2, exitCode ? new Error("exited with error code: " + exitCode) : null);
-  };
-  var onerror = function(err) {
-    callback.call(stream2, err);
-  };
-  var onclose = function() {
-    process.nextTick(onclosenexttick);
-  };
-  var onclosenexttick = function() {
-    if (cancelled) return;
-    if (readable && !(rs && (rs.ended && !rs.destroyed))) return callback.call(stream2, new Error("premature close"));
-    if (writable && !(ws && (ws.ended && !ws.destroyed))) return callback.call(stream2, new Error("premature close"));
-  };
-  var onrequest = function() {
-    stream2.req.on("finish", onfinish);
-  };
-  if (isRequest$1(stream2)) {
-    stream2.on("complete", onfinish);
-    stream2.on("abort", onclose);
-    if (stream2.req) onrequest();
-    else stream2.on("request", onrequest);
-  } else if (writable && !ws) {
-    stream2.on("end", onlegacyfinish);
-    stream2.on("close", onlegacyfinish);
-  }
-  if (isChildProcess(stream2)) stream2.on("exit", onexit);
-  stream2.on("end", onend);
-  stream2.on("finish", onfinish);
-  if (opts.error !== false) stream2.on("error", onerror);
-  stream2.on("close", onclose);
-  return function() {
-    cancelled = true;
-    stream2.removeListener("complete", onfinish);
-    stream2.removeListener("abort", onclose);
-    stream2.removeListener("request", onrequest);
-    if (stream2.req) stream2.req.removeListener("finish", onfinish);
-    stream2.removeListener("end", onlegacyfinish);
-    stream2.removeListener("close", onlegacyfinish);
-    stream2.removeListener("finish", onfinish);
-    stream2.removeListener("exit", onexit);
-    stream2.removeListener("end", onend);
-    stream2.removeListener("error", onerror);
-    stream2.removeListener("close", onclose);
-  };
-};
-var endOfStream = eos$1;
-var once = onceExports;
-var eos = endOfStream;
-var fs$3;
+}, Rr = Xe, _r = Je, Ar = Rr, Q;
 try {
-  fs$3 = require("fs");
-} catch (e) {
+  Q = require("fs");
+} catch {
 }
-var noop = function() {
-};
-var ancient = /^v?\.0/.test(process.version);
-var isFn = function(fn) {
-  return typeof fn === "function";
-};
-var isFS = function(stream2) {
-  if (!ancient) return false;
-  if (!fs$3) return false;
-  return (stream2 instanceof (fs$3.ReadStream || noop) || stream2 instanceof (fs$3.WriteStream || noop)) && isFn(stream2.close);
-};
-var isRequest = function(stream2) {
-  return stream2.setHeader && isFn(stream2.abort);
-};
-var destroyer = function(stream2, reading, writing, callback) {
-  callback = once(callback);
-  var closed = false;
-  stream2.on("close", function() {
-    closed = true;
+var W = function() {
+}, Tr = /^v?\.0/.test(process.version), ne = function(e) {
+  return typeof e == "function";
+}, Mr = function(e) {
+  return !Tr || !Q ? !1 : (e instanceof (Q.ReadStream || W) || e instanceof (Q.WriteStream || W)) && ne(e.close);
+}, Pr = function(e) {
+  return e.setHeader && ne(e.abort);
+}, Nr = function(e, r, n, t) {
+  t = _r(t);
+  var i = !1;
+  e.on("close", function() {
+    i = !0;
+  }), Ar(e, { readable: r, writable: n }, function(s) {
+    if (s) return t(s);
+    i = !0, t();
   });
-  eos(stream2, { readable: reading, writable: writing }, function(err) {
-    if (err) return callback(err);
-    closed = true;
-    callback();
-  });
-  var destroyed = false;
-  return function(err) {
-    if (closed) return;
-    if (destroyed) return;
-    destroyed = true;
-    if (isFS(stream2)) return stream2.close(noop);
-    if (isRequest(stream2)) return stream2.abort();
-    if (isFn(stream2.destroy)) return stream2.destroy();
-    callback(err || new Error("stream was destroyed"));
+  var o = !1;
+  return function(s) {
+    if (!i && !o) {
+      if (o = !0, Mr(e)) return e.close(W);
+      if (Pr(e)) return e.abort();
+      if (ne(e.destroy)) return e.destroy();
+      t(s || new Error("stream was destroyed"));
+    }
   };
-};
-var call = function(fn) {
-  fn();
-};
-var pipe = function(from, to) {
-  return from.pipe(to);
-};
-var pump$1 = function() {
-  var streams = Array.prototype.slice.call(arguments);
-  var callback = isFn(streams[streams.length - 1] || noop) && streams.pop() || noop;
-  if (Array.isArray(streams[0])) streams = streams[0];
-  if (streams.length < 2) throw new Error("pump requires two streams per minimum");
-  var error;
-  var destroys = streams.map(function(stream2, i) {
-    var reading = i < streams.length - 1;
-    var writing = i > 0;
-    return destroyer(stream2, reading, writing, function(err) {
-      if (!error) error = err;
-      if (err) destroys.forEach(call);
-      if (reading) return;
-      destroys.forEach(call);
-      callback(error);
+}, Be = function(e) {
+  e();
+}, Br = function(e, r) {
+  return e.pipe(r);
+}, jr = function() {
+  var e = Array.prototype.slice.call(arguments), r = ne(e[e.length - 1] || W) && e.pop() || W;
+  if (Array.isArray(e[0]) && (e = e[0]), e.length < 2) throw new Error("pump requires two streams per minimum");
+  var n, t = e.map(function(i, o) {
+    var s = o < e.length - 1, u = o > 0;
+    return Nr(i, s, u, function(a) {
+      n || (n = a), a && t.forEach(Be), !s && (t.forEach(Be), r(n));
     });
   });
-  return streams.reduce(pipe);
+  return e.reduce(Br);
+}, $r = jr;
+const { PassThrough: Ur } = U;
+var Dr = (e) => {
+  e = { ...e };
+  const { array: r } = e;
+  let { encoding: n } = e;
+  const t = n === "buffer";
+  let i = !1;
+  r ? i = !(n || t) : n = n || "utf8", t && (n = null);
+  const o = new Ur({ objectMode: i });
+  n && o.setEncoding(n);
+  let s = 0;
+  const u = [];
+  return o.on("data", (a) => {
+    u.push(a), i ? s = u.length : s += a.length;
+  }), o.getBufferedValue = () => r ? u : t ? Buffer.concat(u, s) : u.join(""), o.getBufferedLength = () => s, o;
 };
-var pump_1 = pump$1;
-const { PassThrough: PassThroughStream } = require$$6;
-var bufferStream$1 = (options) => {
-  options = { ...options };
-  const { array } = options;
-  let { encoding } = options;
-  const isBuffer = encoding === "buffer";
-  let objectMode = false;
-  if (array) {
-    objectMode = !(encoding || isBuffer);
-  } else {
-    encoding = encoding || "utf8";
-  }
-  if (isBuffer) {
-    encoding = null;
-  }
-  const stream2 = new PassThroughStream({ objectMode });
-  if (encoding) {
-    stream2.setEncoding(encoding);
-  }
-  let length = 0;
-  const chunks = [];
-  stream2.on("data", (chunk) => {
-    chunks.push(chunk);
-    if (objectMode) {
-      length = chunks.length;
-    } else {
-      length += chunk.length;
-    }
-  });
-  stream2.getBufferedValue = () => {
-    if (array) {
-      return chunks;
-    }
-    return isBuffer ? Buffer.concat(chunks, length) : chunks.join("");
-  };
-  stream2.getBufferedLength = () => length;
-  return stream2;
-};
-const { constants: BufferConstants } = require$$0$1;
-const pump = pump_1;
-const bufferStream = bufferStream$1;
-class MaxBufferError extends Error {
+const { constants: qr } = We, Wr = $r, Vr = Dr;
+class Ke extends Error {
   constructor() {
-    super("maxBuffer exceeded");
-    this.name = "MaxBufferError";
+    super("maxBuffer exceeded"), this.name = "MaxBufferError";
   }
 }
-async function getStream$1(inputStream, options) {
-  if (!inputStream) {
+async function ie(e, r) {
+  if (!e)
     return Promise.reject(new Error("Expected a stream"));
-  }
-  options = {
-    maxBuffer: Infinity,
-    ...options
+  r = {
+    maxBuffer: 1 / 0,
+    ...r
   };
-  const { maxBuffer } = options;
-  let stream2;
-  await new Promise((resolve, reject) => {
-    const rejectPromise = (error) => {
-      if (error && stream2.getBufferedLength() <= BufferConstants.MAX_LENGTH) {
-        error.bufferedData = stream2.getBufferedValue();
-      }
-      reject(error);
+  const { maxBuffer: n } = r;
+  let t;
+  return await new Promise((i, o) => {
+    const s = (u) => {
+      u && t.getBufferedLength() <= qr.MAX_LENGTH && (u.bufferedData = t.getBufferedValue()), o(u);
     };
-    stream2 = pump(inputStream, bufferStream(options), (error) => {
-      if (error) {
-        rejectPromise(error);
+    t = Wr(e, Vr(r), (u) => {
+      if (u) {
+        s(u);
         return;
       }
-      resolve();
+      i();
+    }), t.on("data", () => {
+      t.getBufferedLength() > n && s(new Ke());
     });
-    stream2.on("data", () => {
-      if (stream2.getBufferedLength() > maxBuffer) {
-        rejectPromise(new MaxBufferError());
-      }
-    });
-  });
-  return stream2.getBufferedValue();
+  }), t.getBufferedValue();
 }
-getStream$2.exports = getStream$1;
-getStream$2.exports.default = getStream$1;
-getStream$2.exports.buffer = (stream2, options) => getStream$1(stream2, { ...options, encoding: "buffer" });
-getStream$2.exports.array = (stream2, options) => getStream$1(stream2, { ...options, array: true });
-getStream$2.exports.MaxBufferError = MaxBufferError;
-var getStreamExports = getStream$2.exports;
-var yauzl$1 = {};
-var fdSlicer = {};
-var pend = Pend$1;
-function Pend$1() {
-  this.pending = 0;
-  this.max = Infinity;
-  this.listeners = [];
-  this.waiting = [];
-  this.error = null;
+D.exports = ie;
+D.exports.default = ie;
+D.exports.buffer = (e, r) => ie(e, { ...r, encoding: "buffer" });
+D.exports.array = (e, r) => ie(e, { ...r, array: !0 });
+D.exports.MaxBufferError = Ke;
+var Gr = D.exports, I = {}, G = {}, Hr = oe;
+function oe() {
+  this.pending = 0, this.max = 1 / 0, this.listeners = [], this.waiting = [], this.error = null;
 }
-Pend$1.prototype.go = function(fn) {
-  if (this.pending < this.max) {
-    pendGo(this, fn);
-  } else {
-    this.waiting.push(fn);
-  }
+oe.prototype.go = function(e) {
+  this.pending < this.max ? Qe(this, e) : this.waiting.push(e);
 };
-Pend$1.prototype.wait = function(cb) {
-  if (this.pending === 0) {
-    cb(this.error);
-  } else {
-    this.listeners.push(cb);
-  }
+oe.prototype.wait = function(e) {
+  this.pending === 0 ? e(this.error) : this.listeners.push(e);
 };
-Pend$1.prototype.hold = function() {
-  return pendHold(this);
+oe.prototype.hold = function() {
+  return ke(this);
 };
-function pendHold(self) {
-  self.pending += 1;
-  var called = false;
-  return onCb;
-  function onCb(err) {
-    if (called) throw new Error("callback called twice");
-    called = true;
-    self.error = self.error || err;
-    self.pending -= 1;
-    if (self.waiting.length > 0 && self.pending < self.max) {
-      pendGo(self, self.waiting.shift());
-    } else if (self.pending === 0) {
-      var listeners = self.listeners;
-      self.listeners = [];
-      listeners.forEach(cbListener);
+function ke(e) {
+  e.pending += 1;
+  var r = !1;
+  return n;
+  function n(i) {
+    if (r) throw new Error("callback called twice");
+    if (r = !0, e.error = e.error || i, e.pending -= 1, e.waiting.length > 0 && e.pending < e.max)
+      Qe(e, e.waiting.shift());
+    else if (e.pending === 0) {
+      var o = e.listeners;
+      e.listeners = [], o.forEach(t);
     }
   }
-  function cbListener(listener) {
-    listener(self.error);
+  function t(i) {
+    i(e.error);
   }
 }
-function pendGo(self, fn) {
-  fn(pendHold(self));
+function Qe(e, r) {
+  r(ke(e));
 }
-var fs$2 = fs$4;
-var util$1 = require$$1$1;
-var stream$1 = require$$6;
-var Readable = stream$1.Readable;
-var Writable$1 = stream$1.Writable;
-var PassThrough$1 = stream$1.PassThrough;
-var Pend = pend;
-var EventEmitter$1 = require$$4.EventEmitter;
-fdSlicer.createFromBuffer = createFromBuffer;
-fdSlicer.createFromFd = createFromFd;
-fdSlicer.BufferSlicer = BufferSlicer;
-fdSlicer.FdSlicer = FdSlicer;
-util$1.inherits(FdSlicer, EventEmitter$1);
-function FdSlicer(fd, options) {
-  options = options || {};
-  EventEmitter$1.call(this);
-  this.fd = fd;
-  this.pend = new Pend();
-  this.pend.max = 1;
-  this.refCount = 0;
-  this.autoClose = !!options.autoClose;
+var H = w, se = V, Ce = U, er = Ce.Readable, Ee = Ce.Writable, Zr = Ce.PassThrough, Yr = Hr, ae = Ve.EventEmitter;
+G.createFromBuffer = Jr;
+G.createFromFd = Xr;
+G.BufferSlicer = R;
+G.FdSlicer = z;
+se.inherits(z, ae);
+function z(e, r) {
+  r = r || {}, ae.call(this), this.fd = e, this.pend = new Yr(), this.pend.max = 1, this.refCount = 0, this.autoClose = !!r.autoClose;
 }
-FdSlicer.prototype.read = function(buffer, offset, length, position, callback) {
-  var self = this;
-  self.pend.go(function(cb) {
-    fs$2.read(self.fd, buffer, offset, length, position, function(err, bytesRead, buffer2) {
-      cb();
-      callback(err, bytesRead, buffer2);
+z.prototype.read = function(e, r, n, t, i) {
+  var o = this;
+  o.pend.go(function(s) {
+    H.read(o.fd, e, r, n, t, function(u, a, h) {
+      s(), i(u, a, h);
     });
   });
 };
-FdSlicer.prototype.write = function(buffer, offset, length, position, callback) {
-  var self = this;
-  self.pend.go(function(cb) {
-    fs$2.write(self.fd, buffer, offset, length, position, function(err, written, buffer2) {
-      cb();
-      callback(err, written, buffer2);
+z.prototype.write = function(e, r, n, t, i) {
+  var o = this;
+  o.pend.go(function(s) {
+    H.write(o.fd, e, r, n, t, function(u, a, h) {
+      s(), i(u, a, h);
     });
   });
 };
-FdSlicer.prototype.createReadStream = function(options) {
-  return new ReadStream(this, options);
+z.prototype.createReadStream = function(e) {
+  return new fe(this, e);
 };
-FdSlicer.prototype.createWriteStream = function(options) {
-  return new WriteStream(this, options);
+z.prototype.createWriteStream = function(e) {
+  return new ce(this, e);
 };
-FdSlicer.prototype.ref = function() {
+z.prototype.ref = function() {
   this.refCount += 1;
 };
-FdSlicer.prototype.unref = function() {
-  var self = this;
-  self.refCount -= 1;
-  if (self.refCount > 0) return;
-  if (self.refCount < 0) throw new Error("invalid unref");
-  if (self.autoClose) {
-    fs$2.close(self.fd, onCloseDone);
-  }
-  function onCloseDone(err) {
-    if (err) {
-      self.emit("error", err);
-    } else {
-      self.emit("close");
-    }
+z.prototype.unref = function() {
+  var e = this;
+  if (e.refCount -= 1, e.refCount > 0) return;
+  if (e.refCount < 0) throw new Error("invalid unref");
+  e.autoClose && H.close(e.fd, r);
+  function r(n) {
+    n ? e.emit("error", n) : e.emit("close");
   }
 };
-util$1.inherits(ReadStream, Readable);
-function ReadStream(context, options) {
-  options = options || {};
-  Readable.call(this, options);
-  this.context = context;
-  this.context.ref();
-  this.start = options.start || 0;
-  this.endOffset = options.end;
-  this.pos = this.start;
-  this.destroyed = false;
+se.inherits(fe, er);
+function fe(e, r) {
+  r = r || {}, er.call(this, r), this.context = e, this.context.ref(), this.start = r.start || 0, this.endOffset = r.end, this.pos = this.start, this.destroyed = !1;
 }
-ReadStream.prototype._read = function(n) {
-  var self = this;
-  if (self.destroyed) return;
-  var toRead = Math.min(self._readableState.highWaterMark, n);
-  if (self.endOffset != null) {
-    toRead = Math.min(toRead, self.endOffset - self.pos);
-  }
-  if (toRead <= 0) {
-    self.destroyed = true;
-    self.push(null);
-    self.context.unref();
-    return;
-  }
-  self.context.pend.go(function(cb) {
-    if (self.destroyed) return cb();
-    var buffer = new Buffer(toRead);
-    fs$2.read(self.context.fd, buffer, 0, toRead, self.pos, function(err, bytesRead) {
-      if (err) {
-        self.destroy(err);
-      } else if (bytesRead === 0) {
-        self.destroyed = true;
-        self.push(null);
-        self.context.unref();
-      } else {
-        self.pos += bytesRead;
-        self.push(buffer.slice(0, bytesRead));
-      }
-      cb();
-    });
-  });
-};
-ReadStream.prototype.destroy = function(err) {
-  if (this.destroyed) return;
-  err = err || new Error("stream destroyed");
-  this.destroyed = true;
-  this.emit("error", err);
-  this.context.unref();
-};
-util$1.inherits(WriteStream, Writable$1);
-function WriteStream(context, options) {
-  options = options || {};
-  Writable$1.call(this, options);
-  this.context = context;
-  this.context.ref();
-  this.start = options.start || 0;
-  this.endOffset = options.end == null ? Infinity : +options.end;
-  this.bytesWritten = 0;
-  this.pos = this.start;
-  this.destroyed = false;
-  this.on("finish", this.destroy.bind(this));
-}
-WriteStream.prototype._write = function(buffer, encoding, callback) {
-  var self = this;
-  if (self.destroyed) return;
-  if (self.pos + buffer.length > self.endOffset) {
-    var err = new Error("maximum file length exceeded");
-    err.code = "ETOOBIG";
-    self.destroy();
-    callback(err);
-    return;
-  }
-  self.context.pend.go(function(cb) {
-    if (self.destroyed) return cb();
-    fs$2.write(self.context.fd, buffer, 0, buffer.length, self.pos, function(err2, bytes) {
-      if (err2) {
-        self.destroy();
-        cb();
-        callback(err2);
-      } else {
-        self.bytesWritten += bytes;
-        self.pos += bytes;
-        self.emit("progress");
-        cb();
-        callback();
-      }
-    });
-  });
-};
-WriteStream.prototype.destroy = function() {
-  if (this.destroyed) return;
-  this.destroyed = true;
-  this.context.unref();
-};
-util$1.inherits(BufferSlicer, EventEmitter$1);
-function BufferSlicer(buffer, options) {
-  EventEmitter$1.call(this);
-  options = options || {};
-  this.refCount = 0;
-  this.buffer = buffer;
-  this.maxChunkSize = options.maxChunkSize || Number.MAX_SAFE_INTEGER;
-}
-BufferSlicer.prototype.read = function(buffer, offset, length, position, callback) {
-  var end = position + length;
-  var delta = end - this.buffer.length;
-  var written = delta > 0 ? delta : length;
-  this.buffer.copy(buffer, offset, position, end);
-  setImmediate(function() {
-    callback(null, written);
-  });
-};
-BufferSlicer.prototype.write = function(buffer, offset, length, position, callback) {
-  buffer.copy(this.buffer, position, offset, offset + length);
-  setImmediate(function() {
-    callback(null, length, buffer);
-  });
-};
-BufferSlicer.prototype.createReadStream = function(options) {
-  options = options || {};
-  var readStream = new PassThrough$1(options);
-  readStream.destroyed = false;
-  readStream.start = options.start || 0;
-  readStream.endOffset = options.end;
-  readStream.pos = readStream.endOffset || this.buffer.length;
-  var entireSlice = this.buffer.slice(readStream.start, readStream.pos);
-  var offset = 0;
-  while (true) {
-    var nextOffset = offset + this.maxChunkSize;
-    if (nextOffset >= entireSlice.length) {
-      if (offset < entireSlice.length) {
-        readStream.write(entireSlice.slice(offset, entireSlice.length));
-      }
-      break;
-    }
-    readStream.write(entireSlice.slice(offset, nextOffset));
-    offset = nextOffset;
-  }
-  readStream.end();
-  readStream.destroy = function() {
-    readStream.destroyed = true;
-  };
-  return readStream;
-};
-BufferSlicer.prototype.createWriteStream = function(options) {
-  var bufferSlicer = this;
-  options = options || {};
-  var writeStream = new Writable$1(options);
-  writeStream.start = options.start || 0;
-  writeStream.endOffset = options.end == null ? this.buffer.length : +options.end;
-  writeStream.bytesWritten = 0;
-  writeStream.pos = writeStream.start;
-  writeStream.destroyed = false;
-  writeStream._write = function(buffer, encoding, callback) {
-    if (writeStream.destroyed) return;
-    var end = writeStream.pos + buffer.length;
-    if (end > writeStream.endOffset) {
-      var err = new Error("maximum file length exceeded");
-      err.code = "ETOOBIG";
-      writeStream.destroyed = true;
-      callback(err);
+fe.prototype._read = function(e) {
+  var r = this;
+  if (!r.destroyed) {
+    var n = Math.min(r._readableState.highWaterMark, e);
+    if (r.endOffset != null && (n = Math.min(n, r.endOffset - r.pos)), n <= 0) {
+      r.destroyed = !0, r.push(null), r.context.unref();
       return;
     }
-    buffer.copy(bufferSlicer.buffer, writeStream.pos, 0, buffer.length);
-    writeStream.bytesWritten += buffer.length;
-    writeStream.pos = end;
-    writeStream.emit("progress");
-    callback();
-  };
-  writeStream.destroy = function() {
-    writeStream.destroyed = true;
-  };
-  return writeStream;
-};
-BufferSlicer.prototype.ref = function() {
-  this.refCount += 1;
-};
-BufferSlicer.prototype.unref = function() {
-  this.refCount -= 1;
-  if (this.refCount < 0) {
-    throw new Error("invalid unref");
+    r.context.pend.go(function(t) {
+      if (r.destroyed) return t();
+      var i = new Buffer(n);
+      H.read(r.context.fd, i, 0, n, r.pos, function(o, s) {
+        o ? r.destroy(o) : s === 0 ? (r.destroyed = !0, r.push(null), r.context.unref()) : (r.pos += s, r.push(i.slice(0, s))), t();
+      });
+    });
   }
 };
-function createFromBuffer(buffer, options) {
-  return new BufferSlicer(buffer, options);
+fe.prototype.destroy = function(e) {
+  this.destroyed || (e = e || new Error("stream destroyed"), this.destroyed = !0, this.emit("error", e), this.context.unref());
+};
+se.inherits(ce, Ee);
+function ce(e, r) {
+  r = r || {}, Ee.call(this, r), this.context = e, this.context.ref(), this.start = r.start || 0, this.endOffset = r.end == null ? 1 / 0 : +r.end, this.bytesWritten = 0, this.pos = this.start, this.destroyed = !1, this.on("finish", this.destroy.bind(this));
 }
-function createFromFd(fd, options) {
-  return new FdSlicer(fd, options);
+ce.prototype._write = function(e, r, n) {
+  var t = this;
+  if (!t.destroyed) {
+    if (t.pos + e.length > t.endOffset) {
+      var i = new Error("maximum file length exceeded");
+      i.code = "ETOOBIG", t.destroy(), n(i);
+      return;
+    }
+    t.context.pend.go(function(o) {
+      if (t.destroyed) return o();
+      H.write(t.context.fd, e, 0, e.length, t.pos, function(s, u) {
+        s ? (t.destroy(), o(), n(s)) : (t.bytesWritten += u, t.pos += u, t.emit("progress"), o(), n());
+      });
+    });
+  }
+};
+ce.prototype.destroy = function() {
+  this.destroyed || (this.destroyed = !0, this.context.unref());
+};
+se.inherits(R, ae);
+function R(e, r) {
+  ae.call(this), r = r || {}, this.refCount = 0, this.buffer = e, this.maxChunkSize = r.maxChunkSize || Number.MAX_SAFE_INTEGER;
 }
-var Buffer$1 = require$$0$1.Buffer;
-var CRC_TABLE = [
+R.prototype.read = function(e, r, n, t, i) {
+  var o = t + n, s = o - this.buffer.length, u = s > 0 ? s : n;
+  this.buffer.copy(e, r, t, o), setImmediate(function() {
+    i(null, u);
+  });
+};
+R.prototype.write = function(e, r, n, t, i) {
+  e.copy(this.buffer, t, r, r + n), setImmediate(function() {
+    i(null, n, e);
+  });
+};
+R.prototype.createReadStream = function(e) {
+  e = e || {};
+  var r = new Zr(e);
+  r.destroyed = !1, r.start = e.start || 0, r.endOffset = e.end, r.pos = r.endOffset || this.buffer.length;
+  for (var n = this.buffer.slice(r.start, r.pos), t = 0; ; ) {
+    var i = t + this.maxChunkSize;
+    if (i >= n.length) {
+      t < n.length && r.write(n.slice(t, n.length));
+      break;
+    }
+    r.write(n.slice(t, i)), t = i;
+  }
+  return r.end(), r.destroy = function() {
+    r.destroyed = !0;
+  }, r;
+};
+R.prototype.createWriteStream = function(e) {
+  var r = this;
+  e = e || {};
+  var n = new Ee(e);
+  return n.start = e.start || 0, n.endOffset = e.end == null ? this.buffer.length : +e.end, n.bytesWritten = 0, n.pos = n.start, n.destroyed = !1, n._write = function(t, i, o) {
+    if (!n.destroyed) {
+      var s = n.pos + t.length;
+      if (s > n.endOffset) {
+        var u = new Error("maximum file length exceeded");
+        u.code = "ETOOBIG", n.destroyed = !0, o(u);
+        return;
+      }
+      t.copy(r.buffer, n.pos, 0, t.length), n.bytesWritten += t.length, n.pos = s, n.emit("progress"), o();
+    }
+  }, n.destroy = function() {
+    n.destroyed = !0;
+  }, n;
+};
+R.prototype.ref = function() {
+  this.refCount += 1;
+};
+R.prototype.unref = function() {
+  if (this.refCount -= 1, this.refCount < 0)
+    throw new Error("invalid unref");
+};
+function Jr(e, r) {
+  return new R(e, r);
+}
+function Xr(e, r) {
+  return new z(e, r);
+}
+var _ = We.Buffer, ye = [
   0,
   1996959894,
   3993919788,
@@ -1640,957 +1151,610 @@ var CRC_TABLE = [
   1510334235,
   755167117
 ];
-if (typeof Int32Array !== "undefined") {
-  CRC_TABLE = new Int32Array(CRC_TABLE);
+typeof Int32Array < "u" && (ye = new Int32Array(ye));
+function rr(e) {
+  if (_.isBuffer(e))
+    return e;
+  var r = typeof _.alloc == "function" && typeof _.from == "function";
+  if (typeof e == "number")
+    return r ? _.alloc(e) : new _(e);
+  if (typeof e == "string")
+    return r ? _.from(e) : new _(e);
+  throw new Error("input must be buffer, number, or string, received " + typeof e);
 }
-function ensureBuffer(input) {
-  if (Buffer$1.isBuffer(input)) {
-    return input;
-  }
-  var hasNewBufferAPI = typeof Buffer$1.alloc === "function" && typeof Buffer$1.from === "function";
-  if (typeof input === "number") {
-    return hasNewBufferAPI ? Buffer$1.alloc(input) : new Buffer$1(input);
-  } else if (typeof input === "string") {
-    return hasNewBufferAPI ? Buffer$1.from(input) : new Buffer$1(input);
-  } else {
-    throw new Error("input must be buffer, number, or string, received " + typeof input);
-  }
+function Kr(e) {
+  var r = rr(4);
+  return r.writeInt32BE(e, 0), r;
 }
-function bufferizeInt(num) {
-  var tmp = ensureBuffer(4);
-  tmp.writeInt32BE(num, 0);
-  return tmp;
+function Fe(e, r) {
+  e = rr(e), _.isBuffer(r) && (r = r.readUInt32BE(0));
+  for (var n = ~~r ^ -1, t = 0; t < e.length; t++)
+    n = ye[(n ^ e[t]) & 255] ^ n >>> 8;
+  return n ^ -1;
 }
-function _crc32(buf, previous) {
-  buf = ensureBuffer(buf);
-  if (Buffer$1.isBuffer(previous)) {
-    previous = previous.readUInt32BE(0);
-  }
-  var crc = ~~previous ^ -1;
-  for (var n = 0; n < buf.length; n++) {
-    crc = CRC_TABLE[(crc ^ buf[n]) & 255] ^ crc >>> 8;
-  }
-  return crc ^ -1;
+function Se() {
+  return Kr(Fe.apply(null, arguments));
 }
-function crc32$1() {
-  return bufferizeInt(_crc32.apply(null, arguments));
-}
-crc32$1.signed = function() {
-  return _crc32.apply(null, arguments);
+Se.signed = function() {
+  return Fe.apply(null, arguments);
 };
-crc32$1.unsigned = function() {
-  return _crc32.apply(null, arguments) >>> 0;
+Se.unsigned = function() {
+  return Fe.apply(null, arguments) >>> 0;
 };
-var bufferCrc32 = crc32$1;
-var fs$1 = fs$4;
-var zlib = require$$1$2;
-var fd_slicer = fdSlicer;
-var crc32 = bufferCrc32;
-var util = require$$1$1;
-var EventEmitter = require$$4.EventEmitter;
-var Transform = require$$6.Transform;
-var PassThrough = require$$6.PassThrough;
-var Writable = require$$6.Writable;
-yauzl$1.open = open;
-yauzl$1.fromFd = fromFd;
-yauzl$1.fromBuffer = fromBuffer;
-yauzl$1.fromRandomAccessReader = fromRandomAccessReader;
-yauzl$1.dosDateTimeToDate = dosDateTimeToDate;
-yauzl$1.validateFileName = validateFileName;
-yauzl$1.ZipFile = ZipFile;
-yauzl$1.Entry = Entry;
-yauzl$1.RandomAccessReader = RandomAccessReader;
-function open(path2, options, callback) {
-  if (typeof options === "function") {
-    callback = options;
-    options = null;
-  }
-  if (options == null) options = {};
-  if (options.autoClose == null) options.autoClose = true;
-  if (options.lazyEntries == null) options.lazyEntries = false;
-  if (options.decodeStrings == null) options.decodeStrings = true;
-  if (options.validateEntrySizes == null) options.validateEntrySizes = true;
-  if (options.strictFileNames == null) options.strictFileNames = false;
-  if (callback == null) callback = defaultCallback;
-  fs$1.open(path2, "r", function(err, fd) {
-    if (err) return callback(err);
-    fromFd(fd, options, function(err2, zipfile) {
-      if (err2) fs$1.close(fd, defaultCallback);
-      callback(err2, zipfile);
+var kr = Se, ge = w, Qr = xr, tr = G, et = kr, ue = V, de = Ve.EventEmitter, nr = U.Transform, Ie = U.PassThrough, rt = U.Writable;
+I.open = tt;
+I.fromFd = ir;
+I.fromBuffer = nt;
+I.fromRandomAccessReader = Oe;
+I.dosDateTimeToDate = sr;
+I.validateFileName = ar;
+I.ZipFile = A;
+I.Entry = Z;
+I.RandomAccessReader = T;
+function tt(e, r, n) {
+  typeof r == "function" && (n = r, r = null), r == null && (r = {}), r.autoClose == null && (r.autoClose = !0), r.lazyEntries == null && (r.lazyEntries = !1), r.decodeStrings == null && (r.decodeStrings = !0), r.validateEntrySizes == null && (r.validateEntrySizes = !0), r.strictFileNames == null && (r.strictFileNames = !1), n == null && (n = re), ge.open(e, "r", function(t, i) {
+    if (t) return n(t);
+    ir(i, r, function(o, s) {
+      o && ge.close(i, re), n(o, s);
     });
   });
 }
-function fromFd(fd, options, callback) {
-  if (typeof options === "function") {
-    callback = options;
-    options = null;
-  }
-  if (options == null) options = {};
-  if (options.autoClose == null) options.autoClose = false;
-  if (options.lazyEntries == null) options.lazyEntries = false;
-  if (options.decodeStrings == null) options.decodeStrings = true;
-  if (options.validateEntrySizes == null) options.validateEntrySizes = true;
-  if (options.strictFileNames == null) options.strictFileNames = false;
-  if (callback == null) callback = defaultCallback;
-  fs$1.fstat(fd, function(err, stats) {
-    if (err) return callback(err);
-    var reader = fd_slicer.createFromFd(fd, { autoClose: true });
-    fromRandomAccessReader(reader, stats.size, options, callback);
+function ir(e, r, n) {
+  typeof r == "function" && (n = r, r = null), r == null && (r = {}), r.autoClose == null && (r.autoClose = !1), r.lazyEntries == null && (r.lazyEntries = !1), r.decodeStrings == null && (r.decodeStrings = !0), r.validateEntrySizes == null && (r.validateEntrySizes = !0), r.strictFileNames == null && (r.strictFileNames = !1), n == null && (n = re), ge.fstat(e, function(t, i) {
+    if (t) return n(t);
+    var o = tr.createFromFd(e, { autoClose: !0 });
+    Oe(o, i.size, r, n);
   });
 }
-function fromBuffer(buffer, options, callback) {
-  if (typeof options === "function") {
-    callback = options;
-    options = null;
-  }
-  if (options == null) options = {};
-  options.autoClose = false;
-  if (options.lazyEntries == null) options.lazyEntries = false;
-  if (options.decodeStrings == null) options.decodeStrings = true;
-  if (options.validateEntrySizes == null) options.validateEntrySizes = true;
-  if (options.strictFileNames == null) options.strictFileNames = false;
-  var reader = fd_slicer.createFromBuffer(buffer, { maxChunkSize: 65536 });
-  fromRandomAccessReader(reader, buffer.length, options, callback);
+function nt(e, r, n) {
+  typeof r == "function" && (n = r, r = null), r == null && (r = {}), r.autoClose = !1, r.lazyEntries == null && (r.lazyEntries = !1), r.decodeStrings == null && (r.decodeStrings = !0), r.validateEntrySizes == null && (r.validateEntrySizes = !0), r.strictFileNames == null && (r.strictFileNames = !1);
+  var t = tr.createFromBuffer(e, { maxChunkSize: 65536 });
+  Oe(t, e.length, r, n);
 }
-function fromRandomAccessReader(reader, totalSize, options, callback) {
-  if (typeof options === "function") {
-    callback = options;
-    options = null;
-  }
-  if (options == null) options = {};
-  if (options.autoClose == null) options.autoClose = true;
-  if (options.lazyEntries == null) options.lazyEntries = false;
-  if (options.decodeStrings == null) options.decodeStrings = true;
-  var decodeStrings = !!options.decodeStrings;
-  if (options.validateEntrySizes == null) options.validateEntrySizes = true;
-  if (options.strictFileNames == null) options.strictFileNames = false;
-  if (callback == null) callback = defaultCallback;
-  if (typeof totalSize !== "number") throw new Error("expected totalSize parameter to be a number");
-  if (totalSize > Number.MAX_SAFE_INTEGER) {
+function Oe(e, r, n, t) {
+  typeof n == "function" && (t = n, n = null), n == null && (n = {}), n.autoClose == null && (n.autoClose = !0), n.lazyEntries == null && (n.lazyEntries = !1), n.decodeStrings == null && (n.decodeStrings = !0);
+  var i = !!n.decodeStrings;
+  if (n.validateEntrySizes == null && (n.validateEntrySizes = !0), n.strictFileNames == null && (n.strictFileNames = !1), t == null && (t = re), typeof r != "number") throw new Error("expected totalSize parameter to be a number");
+  if (r > Number.MAX_SAFE_INTEGER)
     throw new Error("zip file too large. only file sizes up to 2^52 are supported due to JavaScript's Number type being an IEEE 754 double.");
-  }
-  reader.ref();
-  var eocdrWithoutCommentSize = 22;
-  var maxCommentSize = 65535;
-  var bufferSize = Math.min(eocdrWithoutCommentSize + maxCommentSize, totalSize);
-  var buffer = newBuffer(bufferSize);
-  var bufferReadStart = totalSize - buffer.length;
-  readAndAssertNoEof(reader, buffer, 0, bufferSize, bufferReadStart, function(err) {
-    if (err) return callback(err);
-    for (var i = bufferSize - eocdrWithoutCommentSize; i >= 0; i -= 1) {
-      if (buffer.readUInt32LE(i) !== 101010256) continue;
-      var eocdrBuffer = buffer.slice(i);
-      var diskNumber = eocdrBuffer.readUInt16LE(4);
-      if (diskNumber !== 0) {
-        return callback(new Error("multi-disk zip files are not supported: found disk number: " + diskNumber));
-      }
-      var entryCount = eocdrBuffer.readUInt16LE(10);
-      var centralDirectoryOffset = eocdrBuffer.readUInt32LE(16);
-      var commentLength = eocdrBuffer.readUInt16LE(20);
-      var expectedCommentLength = eocdrBuffer.length - eocdrWithoutCommentSize;
-      if (commentLength !== expectedCommentLength) {
-        return callback(new Error("invalid comment length. expected: " + expectedCommentLength + ". found: " + commentLength));
-      }
-      var comment = decodeStrings ? decodeBuffer(eocdrBuffer, 22, eocdrBuffer.length, false) : eocdrBuffer.slice(22);
-      if (!(entryCount === 65535 || centralDirectoryOffset === 4294967295)) {
-        return callback(null, new ZipFile(reader, centralDirectoryOffset, totalSize, entryCount, comment, options.autoClose, options.lazyEntries, decodeStrings, options.validateEntrySizes, options.strictFileNames));
-      }
-      var zip64EocdlBuffer = newBuffer(20);
-      var zip64EocdlOffset = bufferReadStart + i - zip64EocdlBuffer.length;
-      readAndAssertNoEof(reader, zip64EocdlBuffer, 0, zip64EocdlBuffer.length, zip64EocdlOffset, function(err2) {
-        if (err2) return callback(err2);
-        if (zip64EocdlBuffer.readUInt32LE(0) !== 117853008) {
-          return callback(new Error("invalid zip64 end of central directory locator signature"));
-        }
-        var zip64EocdrOffset = readUInt64LE(zip64EocdlBuffer, 8);
-        var zip64EocdrBuffer = newBuffer(56);
-        readAndAssertNoEof(reader, zip64EocdrBuffer, 0, zip64EocdrBuffer.length, zip64EocdrOffset, function(err3) {
-          if (err3) return callback(err3);
-          if (zip64EocdrBuffer.readUInt32LE(0) !== 101075792) {
-            return callback(new Error("invalid zip64 end of central directory record signature"));
-          }
-          entryCount = readUInt64LE(zip64EocdrBuffer, 32);
-          centralDirectoryOffset = readUInt64LE(zip64EocdrBuffer, 48);
-          return callback(null, new ZipFile(reader, centralDirectoryOffset, totalSize, entryCount, comment, options.autoClose, options.lazyEntries, decodeStrings, options.validateEntrySizes, options.strictFileNames));
+  e.ref();
+  var o = 22, s = 65535, u = Math.min(o + s, r), a = S(u), h = r - a.length;
+  B(e, a, 0, u, h, function(d) {
+    if (d) return t(d);
+    for (var c = u - o; c >= 0; c -= 1)
+      if (a.readUInt32LE(c) === 101010256) {
+        var f = a.slice(c), l = f.readUInt16LE(4);
+        if (l !== 0)
+          return t(new Error("multi-disk zip files are not supported: found disk number: " + l));
+        var m = f.readUInt16LE(10), x = f.readUInt32LE(16), p = f.readUInt16LE(20), v = f.length - o;
+        if (p !== v)
+          return t(new Error("invalid comment length. expected: " + v + ". found: " + p));
+        var y = i ? ee(f, 22, f.length, !1) : f.slice(22);
+        if (!(m === 65535 || x === 4294967295))
+          return t(null, new A(e, x, r, m, y, n.autoClose, n.lazyEntries, i, n.validateEntrySizes, n.strictFileNames));
+        var g = S(20), q = h + c - g.length;
+        B(e, g, 0, g.length, q, function(F) {
+          if (F) return t(F);
+          if (g.readUInt32LE(0) !== 117853008)
+            return t(new Error("invalid zip64 end of central directory locator signature"));
+          var ze = j(g, 8), O = S(56);
+          B(e, O, 0, O.length, ze, function(J) {
+            return J ? t(J) : O.readUInt32LE(0) !== 101075792 ? t(new Error("invalid zip64 end of central directory record signature")) : (m = j(O, 32), x = j(O, 48), t(null, new A(e, x, r, m, y, n.autoClose, n.lazyEntries, i, n.validateEntrySizes, n.strictFileNames)));
+          });
         });
-      });
-      return;
-    }
-    callback(new Error("end of central directory record signature not found"));
+        return;
+      }
+    t(new Error("end of central directory record signature not found"));
   });
 }
-util.inherits(ZipFile, EventEmitter);
-function ZipFile(reader, centralDirectoryOffset, fileSize, entryCount, comment, autoClose, lazyEntries, decodeStrings, validateEntrySizes, strictFileNames) {
-  var self = this;
-  EventEmitter.call(self);
-  self.reader = reader;
-  self.reader.on("error", function(err) {
-    emitError(self, err);
-  });
-  self.reader.once("close", function() {
-    self.emit("close");
-  });
-  self.readEntryCursor = centralDirectoryOffset;
-  self.fileSize = fileSize;
-  self.entryCount = entryCount;
-  self.comment = comment;
-  self.entriesRead = 0;
-  self.autoClose = !!autoClose;
-  self.lazyEntries = !!lazyEntries;
-  self.decodeStrings = !!decodeStrings;
-  self.validateEntrySizes = !!validateEntrySizes;
-  self.strictFileNames = !!strictFileNames;
-  self.isOpen = true;
-  self.emittedError = false;
-  if (!self.lazyEntries) self._readEntry();
+ue.inherits(A, de);
+function A(e, r, n, t, i, o, s, u, a, h) {
+  var d = this;
+  de.call(d), d.reader = e, d.reader.on("error", function(c) {
+    or(d, c);
+  }), d.reader.once("close", function() {
+    d.emit("close");
+  }), d.readEntryCursor = r, d.fileSize = n, d.entryCount = t, d.comment = i, d.entriesRead = 0, d.autoClose = !!o, d.lazyEntries = !!s, d.decodeStrings = !!u, d.validateEntrySizes = !!a, d.strictFileNames = !!h, d.isOpen = !0, d.emittedError = !1, d.lazyEntries || d._readEntry();
 }
-ZipFile.prototype.close = function() {
-  if (!this.isOpen) return;
-  this.isOpen = false;
-  this.reader.unref();
+A.prototype.close = function() {
+  this.isOpen && (this.isOpen = !1, this.reader.unref());
 };
-function emitErrorAndAutoClose(self, err) {
-  if (self.autoClose) self.close();
-  emitError(self, err);
+function C(e, r) {
+  e.autoClose && e.close(), or(e, r);
 }
-function emitError(self, err) {
-  if (self.emittedError) return;
-  self.emittedError = true;
-  self.emit("error", err);
+function or(e, r) {
+  e.emittedError || (e.emittedError = !0, e.emit("error", r));
 }
-ZipFile.prototype.readEntry = function() {
+A.prototype.readEntry = function() {
   if (!this.lazyEntries) throw new Error("readEntry() called without lazyEntries:true");
   this._readEntry();
 };
-ZipFile.prototype._readEntry = function() {
-  var self = this;
-  if (self.entryCount === self.entriesRead) {
+A.prototype._readEntry = function() {
+  var e = this;
+  if (e.entryCount === e.entriesRead) {
     setImmediate(function() {
-      if (self.autoClose) self.close();
-      if (self.emittedError) return;
-      self.emit("end");
+      e.autoClose && e.close(), !e.emittedError && e.emit("end");
     });
     return;
   }
-  if (self.emittedError) return;
-  var buffer = newBuffer(46);
-  readAndAssertNoEof(self.reader, buffer, 0, buffer.length, self.readEntryCursor, function(err) {
-    if (err) return emitErrorAndAutoClose(self, err);
-    if (self.emittedError) return;
-    var entry = new Entry();
-    var signature = buffer.readUInt32LE(0);
-    if (signature !== 33639248) return emitErrorAndAutoClose(self, new Error("invalid central directory file header signature: 0x" + signature.toString(16)));
-    entry.versionMadeBy = buffer.readUInt16LE(4);
-    entry.versionNeededToExtract = buffer.readUInt16LE(6);
-    entry.generalPurposeBitFlag = buffer.readUInt16LE(8);
-    entry.compressionMethod = buffer.readUInt16LE(10);
-    entry.lastModFileTime = buffer.readUInt16LE(12);
-    entry.lastModFileDate = buffer.readUInt16LE(14);
-    entry.crc32 = buffer.readUInt32LE(16);
-    entry.compressedSize = buffer.readUInt32LE(20);
-    entry.uncompressedSize = buffer.readUInt32LE(24);
-    entry.fileNameLength = buffer.readUInt16LE(28);
-    entry.extraFieldLength = buffer.readUInt16LE(30);
-    entry.fileCommentLength = buffer.readUInt16LE(32);
-    entry.internalFileAttributes = buffer.readUInt16LE(36);
-    entry.externalFileAttributes = buffer.readUInt32LE(38);
-    entry.relativeOffsetOfLocalHeader = buffer.readUInt32LE(42);
-    if (entry.generalPurposeBitFlag & 64) return emitErrorAndAutoClose(self, new Error("strong encryption is not supported"));
-    self.readEntryCursor += 46;
-    buffer = newBuffer(entry.fileNameLength + entry.extraFieldLength + entry.fileCommentLength);
-    readAndAssertNoEof(self.reader, buffer, 0, buffer.length, self.readEntryCursor, function(err2) {
-      if (err2) return emitErrorAndAutoClose(self, err2);
-      if (self.emittedError) return;
-      var isUtf8 = (entry.generalPurposeBitFlag & 2048) !== 0;
-      entry.fileName = self.decodeStrings ? decodeBuffer(buffer, 0, entry.fileNameLength, isUtf8) : buffer.slice(0, entry.fileNameLength);
-      var fileCommentStart = entry.fileNameLength + entry.extraFieldLength;
-      var extraFieldBuffer = buffer.slice(entry.fileNameLength, fileCommentStart);
-      entry.extraFields = [];
-      var i = 0;
-      while (i < extraFieldBuffer.length - 3) {
-        var headerId = extraFieldBuffer.readUInt16LE(i + 0);
-        var dataSize = extraFieldBuffer.readUInt16LE(i + 2);
-        var dataStart = i + 4;
-        var dataEnd = dataStart + dataSize;
-        if (dataEnd > extraFieldBuffer.length) return emitErrorAndAutoClose(self, new Error("extra field length exceeds extra field buffer size"));
-        var dataBuffer = newBuffer(dataSize);
-        extraFieldBuffer.copy(dataBuffer, 0, dataStart, dataEnd);
-        entry.extraFields.push({
-          id: headerId,
-          data: dataBuffer
+  if (!e.emittedError) {
+    var r = S(46);
+    B(e.reader, r, 0, r.length, e.readEntryCursor, function(n) {
+      if (n) return C(e, n);
+      if (!e.emittedError) {
+        var t = new Z(), i = r.readUInt32LE(0);
+        if (i !== 33639248) return C(e, new Error("invalid central directory file header signature: 0x" + i.toString(16)));
+        if (t.versionMadeBy = r.readUInt16LE(4), t.versionNeededToExtract = r.readUInt16LE(6), t.generalPurposeBitFlag = r.readUInt16LE(8), t.compressionMethod = r.readUInt16LE(10), t.lastModFileTime = r.readUInt16LE(12), t.lastModFileDate = r.readUInt16LE(14), t.crc32 = r.readUInt32LE(16), t.compressedSize = r.readUInt32LE(20), t.uncompressedSize = r.readUInt32LE(24), t.fileNameLength = r.readUInt16LE(28), t.extraFieldLength = r.readUInt16LE(30), t.fileCommentLength = r.readUInt16LE(32), t.internalFileAttributes = r.readUInt16LE(36), t.externalFileAttributes = r.readUInt32LE(38), t.relativeOffsetOfLocalHeader = r.readUInt32LE(42), t.generalPurposeBitFlag & 64) return C(e, new Error("strong encryption is not supported"));
+        e.readEntryCursor += 46, r = S(t.fileNameLength + t.extraFieldLength + t.fileCommentLength), B(e.reader, r, 0, r.length, e.readEntryCursor, function(o) {
+          if (o) return C(e, o);
+          if (!e.emittedError) {
+            var s = (t.generalPurposeBitFlag & 2048) !== 0;
+            t.fileName = e.decodeStrings ? ee(r, 0, t.fileNameLength, s) : r.slice(0, t.fileNameLength);
+            var u = t.fileNameLength + t.extraFieldLength, a = r.slice(t.fileNameLength, u);
+            t.extraFields = [];
+            for (var h = 0; h < a.length - 3; ) {
+              var d = a.readUInt16LE(h + 0), c = a.readUInt16LE(h + 2), f = h + 4, l = f + c;
+              if (l > a.length) return C(e, new Error("extra field length exceeds extra field buffer size"));
+              var m = S(c);
+              a.copy(m, 0, f, l), t.extraFields.push({
+                id: d,
+                data: m
+              }), h = l;
+            }
+            if (t.fileComment = e.decodeStrings ? ee(r, u, u + t.fileCommentLength, s) : r.slice(u, u + t.fileCommentLength), t.comment = t.fileComment, e.readEntryCursor += r.length, e.entriesRead += 1, t.uncompressedSize === 4294967295 || t.compressedSize === 4294967295 || t.relativeOffsetOfLocalHeader === 4294967295) {
+              for (var x = null, h = 0; h < t.extraFields.length; h++) {
+                var p = t.extraFields[h];
+                if (p.id === 1) {
+                  x = p.data;
+                  break;
+                }
+              }
+              if (x == null)
+                return C(e, new Error("expected zip64 extended information extra field"));
+              var v = 0;
+              if (t.uncompressedSize === 4294967295) {
+                if (v + 8 > x.length)
+                  return C(e, new Error("zip64 extended information extra field does not include uncompressed size"));
+                t.uncompressedSize = j(x, v), v += 8;
+              }
+              if (t.compressedSize === 4294967295) {
+                if (v + 8 > x.length)
+                  return C(e, new Error("zip64 extended information extra field does not include compressed size"));
+                t.compressedSize = j(x, v), v += 8;
+              }
+              if (t.relativeOffsetOfLocalHeader === 4294967295) {
+                if (v + 8 > x.length)
+                  return C(e, new Error("zip64 extended information extra field does not include relative header offset"));
+                t.relativeOffsetOfLocalHeader = j(x, v), v += 8;
+              }
+            }
+            if (e.decodeStrings)
+              for (var h = 0; h < t.extraFields.length; h++) {
+                var p = t.extraFields[h];
+                if (p.id === 28789) {
+                  if (p.data.length < 6 || p.data.readUInt8(0) !== 1)
+                    continue;
+                  var y = p.data.readUInt32LE(1);
+                  if (et.unsigned(r.slice(0, t.fileNameLength)) !== y)
+                    continue;
+                  t.fileName = ee(p.data, 5, p.data.length, !0);
+                  break;
+                }
+              }
+            if (e.validateEntrySizes && t.compressionMethod === 0) {
+              var g = t.uncompressedSize;
+              if (t.isEncrypted() && (g += 12), t.compressedSize !== g) {
+                var q = "compressed/uncompressed size mismatch for stored file: " + t.compressedSize + " != " + t.uncompressedSize;
+                return C(e, new Error(q));
+              }
+            }
+            if (e.decodeStrings) {
+              e.strictFileNames || (t.fileName = t.fileName.replace(/\\/g, "/"));
+              var F = ar(t.fileName, e.validateFileNameOptions);
+              if (F != null) return C(e, new Error(F));
+            }
+            e.emit("entry", t), e.lazyEntries || e._readEntry();
+          }
         });
-        i = dataEnd;
       }
-      entry.fileComment = self.decodeStrings ? decodeBuffer(buffer, fileCommentStart, fileCommentStart + entry.fileCommentLength, isUtf8) : buffer.slice(fileCommentStart, fileCommentStart + entry.fileCommentLength);
-      entry.comment = entry.fileComment;
-      self.readEntryCursor += buffer.length;
-      self.entriesRead += 1;
-      if (entry.uncompressedSize === 4294967295 || entry.compressedSize === 4294967295 || entry.relativeOffsetOfLocalHeader === 4294967295) {
-        var zip64EiefBuffer = null;
-        for (var i = 0; i < entry.extraFields.length; i++) {
-          var extraField = entry.extraFields[i];
-          if (extraField.id === 1) {
-            zip64EiefBuffer = extraField.data;
-            break;
-          }
-        }
-        if (zip64EiefBuffer == null) {
-          return emitErrorAndAutoClose(self, new Error("expected zip64 extended information extra field"));
-        }
-        var index = 0;
-        if (entry.uncompressedSize === 4294967295) {
-          if (index + 8 > zip64EiefBuffer.length) {
-            return emitErrorAndAutoClose(self, new Error("zip64 extended information extra field does not include uncompressed size"));
-          }
-          entry.uncompressedSize = readUInt64LE(zip64EiefBuffer, index);
-          index += 8;
-        }
-        if (entry.compressedSize === 4294967295) {
-          if (index + 8 > zip64EiefBuffer.length) {
-            return emitErrorAndAutoClose(self, new Error("zip64 extended information extra field does not include compressed size"));
-          }
-          entry.compressedSize = readUInt64LE(zip64EiefBuffer, index);
-          index += 8;
-        }
-        if (entry.relativeOffsetOfLocalHeader === 4294967295) {
-          if (index + 8 > zip64EiefBuffer.length) {
-            return emitErrorAndAutoClose(self, new Error("zip64 extended information extra field does not include relative header offset"));
-          }
-          entry.relativeOffsetOfLocalHeader = readUInt64LE(zip64EiefBuffer, index);
-          index += 8;
-        }
-      }
-      if (self.decodeStrings) {
-        for (var i = 0; i < entry.extraFields.length; i++) {
-          var extraField = entry.extraFields[i];
-          if (extraField.id === 28789) {
-            if (extraField.data.length < 6) {
-              continue;
-            }
-            if (extraField.data.readUInt8(0) !== 1) {
-              continue;
-            }
-            var oldNameCrc32 = extraField.data.readUInt32LE(1);
-            if (crc32.unsigned(buffer.slice(0, entry.fileNameLength)) !== oldNameCrc32) {
-              continue;
-            }
-            entry.fileName = decodeBuffer(extraField.data, 5, extraField.data.length, true);
-            break;
-          }
-        }
-      }
-      if (self.validateEntrySizes && entry.compressionMethod === 0) {
-        var expectedCompressedSize = entry.uncompressedSize;
-        if (entry.isEncrypted()) {
-          expectedCompressedSize += 12;
-        }
-        if (entry.compressedSize !== expectedCompressedSize) {
-          var msg = "compressed/uncompressed size mismatch for stored file: " + entry.compressedSize + " != " + entry.uncompressedSize;
-          return emitErrorAndAutoClose(self, new Error(msg));
-        }
-      }
-      if (self.decodeStrings) {
-        if (!self.strictFileNames) {
-          entry.fileName = entry.fileName.replace(/\\/g, "/");
-        }
-        var errorMessage = validateFileName(entry.fileName, self.validateFileNameOptions);
-        if (errorMessage != null) return emitErrorAndAutoClose(self, new Error(errorMessage));
-      }
-      self.emit("entry", entry);
-      if (!self.lazyEntries) self._readEntry();
     });
-  });
+  }
 };
-ZipFile.prototype.openReadStream = function(entry, options, callback) {
-  var self = this;
-  var relativeStart = 0;
-  var relativeEnd = entry.compressedSize;
-  if (callback == null) {
-    callback = options;
-    options = {};
-  } else {
-    if (options.decrypt != null) {
-      if (!entry.isEncrypted()) {
+A.prototype.openReadStream = function(e, r, n) {
+  var t = this, i = 0, o = e.compressedSize;
+  if (n == null)
+    n = r, r = {};
+  else {
+    if (r.decrypt != null) {
+      if (!e.isEncrypted())
         throw new Error("options.decrypt can only be specified for encrypted entries");
-      }
-      if (options.decrypt !== false) throw new Error("invalid options.decrypt value: " + options.decrypt);
-      if (entry.isCompressed()) {
-        if (options.decompress !== false) throw new Error("entry is encrypted and compressed, and options.decompress !== false");
-      }
+      if (r.decrypt !== !1) throw new Error("invalid options.decrypt value: " + r.decrypt);
+      if (e.isCompressed() && r.decompress !== !1)
+        throw new Error("entry is encrypted and compressed, and options.decompress !== false");
     }
-    if (options.decompress != null) {
-      if (!entry.isCompressed()) {
+    if (r.decompress != null) {
+      if (!e.isCompressed())
         throw new Error("options.decompress can only be specified for compressed entries");
-      }
-      if (!(options.decompress === false || options.decompress === true)) {
-        throw new Error("invalid options.decompress value: " + options.decompress);
-      }
+      if (!(r.decompress === !1 || r.decompress === !0))
+        throw new Error("invalid options.decompress value: " + r.decompress);
     }
-    if (options.start != null || options.end != null) {
-      if (entry.isCompressed() && options.decompress !== false) {
+    if (r.start != null || r.end != null) {
+      if (e.isCompressed() && r.decompress !== !1)
         throw new Error("start/end range not allowed for compressed entry without options.decompress === false");
-      }
-      if (entry.isEncrypted() && options.decrypt !== false) {
+      if (e.isEncrypted() && r.decrypt !== !1)
         throw new Error("start/end range not allowed for encrypted entry without options.decrypt === false");
-      }
     }
-    if (options.start != null) {
-      relativeStart = options.start;
-      if (relativeStart < 0) throw new Error("options.start < 0");
-      if (relativeStart > entry.compressedSize) throw new Error("options.start > entry.compressedSize");
+    if (r.start != null) {
+      if (i = r.start, i < 0) throw new Error("options.start < 0");
+      if (i > e.compressedSize) throw new Error("options.start > entry.compressedSize");
     }
-    if (options.end != null) {
-      relativeEnd = options.end;
-      if (relativeEnd < 0) throw new Error("options.end < 0");
-      if (relativeEnd > entry.compressedSize) throw new Error("options.end > entry.compressedSize");
-      if (relativeEnd < relativeStart) throw new Error("options.end < options.start");
+    if (r.end != null) {
+      if (o = r.end, o < 0) throw new Error("options.end < 0");
+      if (o > e.compressedSize) throw new Error("options.end > entry.compressedSize");
+      if (o < i) throw new Error("options.end < options.start");
     }
   }
-  if (!self.isOpen) return callback(new Error("closed"));
-  if (entry.isEncrypted()) {
-    if (options.decrypt !== false) return callback(new Error("entry is encrypted, and options.decrypt !== false"));
-  }
-  self.reader.ref();
-  var buffer = newBuffer(30);
-  readAndAssertNoEof(self.reader, buffer, 0, buffer.length, entry.relativeOffsetOfLocalHeader, function(err) {
+  if (!t.isOpen) return n(new Error("closed"));
+  if (e.isEncrypted() && r.decrypt !== !1)
+    return n(new Error("entry is encrypted, and options.decrypt !== false"));
+  t.reader.ref();
+  var s = S(30);
+  B(t.reader, s, 0, s.length, e.relativeOffsetOfLocalHeader, function(u) {
     try {
-      if (err) return callback(err);
-      var signature = buffer.readUInt32LE(0);
-      if (signature !== 67324752) {
-        return callback(new Error("invalid local file header signature: 0x" + signature.toString(16)));
-      }
-      var fileNameLength = buffer.readUInt16LE(26);
-      var extraFieldLength = buffer.readUInt16LE(28);
-      var localFileHeaderEnd = entry.relativeOffsetOfLocalHeader + buffer.length + fileNameLength + extraFieldLength;
-      var decompress;
-      if (entry.compressionMethod === 0) {
-        decompress = false;
-      } else if (entry.compressionMethod === 8) {
-        decompress = options.decompress != null ? options.decompress : true;
-      } else {
-        return callback(new Error("unsupported compression method: " + entry.compressionMethod));
-      }
-      var fileDataStart = localFileHeaderEnd;
-      var fileDataEnd = fileDataStart + entry.compressedSize;
-      if (entry.compressedSize !== 0) {
-        if (fileDataEnd > self.fileSize) {
-          return callback(new Error("file data overflows file bounds: " + fileDataStart + " + " + entry.compressedSize + " > " + self.fileSize));
-        }
-      }
-      var readStream = self.reader.createReadStream({
-        start: fileDataStart + relativeStart,
-        end: fileDataStart + relativeEnd
-      });
-      var endpointStream = readStream;
-      if (decompress) {
-        var destroyed = false;
-        var inflateFilter = zlib.createInflateRaw();
-        readStream.on("error", function(err2) {
+      if (u) return n(u);
+      var a = s.readUInt32LE(0);
+      if (a !== 67324752)
+        return n(new Error("invalid local file header signature: 0x" + a.toString(16)));
+      var h = s.readUInt16LE(26), d = s.readUInt16LE(28), c = e.relativeOffsetOfLocalHeader + s.length + h + d, f;
+      if (e.compressionMethod === 0)
+        f = !1;
+      else if (e.compressionMethod === 8)
+        f = r.decompress != null ? r.decompress : !0;
+      else
+        return n(new Error("unsupported compression method: " + e.compressionMethod));
+      var l = c, m = l + e.compressedSize;
+      if (e.compressedSize !== 0 && m > t.fileSize)
+        return n(new Error("file data overflows file bounds: " + l + " + " + e.compressedSize + " > " + t.fileSize));
+      var x = t.reader.createReadStream({
+        start: l + i,
+        end: l + o
+      }), p = x;
+      if (f) {
+        var v = !1, y = Qr.createInflateRaw();
+        x.on("error", function(g) {
           setImmediate(function() {
-            if (!destroyed) inflateFilter.emit("error", err2);
+            v || y.emit("error", g);
           });
-        });
-        readStream.pipe(inflateFilter);
-        if (self.validateEntrySizes) {
-          endpointStream = new AssertByteCountStream(entry.uncompressedSize);
-          inflateFilter.on("error", function(err2) {
-            setImmediate(function() {
-              if (!destroyed) endpointStream.emit("error", err2);
-            });
+        }), x.pipe(y), t.validateEntrySizes ? (p = new Y(e.uncompressedSize), y.on("error", function(g) {
+          setImmediate(function() {
+            v || p.emit("error", g);
           });
-          inflateFilter.pipe(endpointStream);
-        } else {
-          endpointStream = inflateFilter;
-        }
-        endpointStream.destroy = function() {
-          destroyed = true;
-          if (inflateFilter !== endpointStream) inflateFilter.unpipe(endpointStream);
-          readStream.unpipe(inflateFilter);
-          readStream.destroy();
+        }), y.pipe(p)) : p = y, p.destroy = function() {
+          v = !0, y !== p && y.unpipe(p), x.unpipe(y), x.destroy();
         };
       }
-      callback(null, endpointStream);
+      n(null, p);
     } finally {
-      self.reader.unref();
+      t.reader.unref();
     }
   });
 };
-function Entry() {
+function Z() {
 }
-Entry.prototype.getLastModDate = function() {
-  return dosDateTimeToDate(this.lastModFileDate, this.lastModFileTime);
+Z.prototype.getLastModDate = function() {
+  return sr(this.lastModFileDate, this.lastModFileTime);
 };
-Entry.prototype.isEncrypted = function() {
+Z.prototype.isEncrypted = function() {
   return (this.generalPurposeBitFlag & 1) !== 0;
 };
-Entry.prototype.isCompressed = function() {
+Z.prototype.isCompressed = function() {
   return this.compressionMethod === 8;
 };
-function dosDateTimeToDate(date, time) {
-  var day = date & 31;
-  var month = (date >> 5 & 15) - 1;
-  var year = (date >> 9 & 127) + 1980;
-  var millisecond = 0;
-  var second = (time & 31) * 2;
-  var minute = time >> 5 & 63;
-  var hour = time >> 11 & 31;
-  return new Date(year, month, day, hour, minute, second, millisecond);
+function sr(e, r) {
+  var n = e & 31, t = (e >> 5 & 15) - 1, i = (e >> 9 & 127) + 1980, o = 0, s = (r & 31) * 2, u = r >> 5 & 63, a = r >> 11 & 31;
+  return new Date(i, t, n, a, u, s, o);
 }
-function validateFileName(fileName) {
-  if (fileName.indexOf("\\") !== -1) {
-    return "invalid characters in fileName: " + fileName;
-  }
-  if (/^[a-zA-Z]:/.test(fileName) || /^\//.test(fileName)) {
-    return "absolute path: " + fileName;
-  }
-  if (fileName.split("/").indexOf("..") !== -1) {
-    return "invalid relative path: " + fileName;
-  }
-  return null;
+function ar(e) {
+  return e.indexOf("\\") !== -1 ? "invalid characters in fileName: " + e : /^[a-zA-Z]:/.test(e) || /^\//.test(e) ? "absolute path: " + e : e.split("/").indexOf("..") !== -1 ? "invalid relative path: " + e : null;
 }
-function readAndAssertNoEof(reader, buffer, offset, length, position, callback) {
-  if (length === 0) {
+function B(e, r, n, t, i, o) {
+  if (t === 0)
     return setImmediate(function() {
-      callback(null, newBuffer(0));
+      o(null, S(0));
     });
-  }
-  reader.read(buffer, offset, length, position, function(err, bytesRead) {
-    if (err) return callback(err);
-    if (bytesRead < length) {
-      return callback(new Error("unexpected EOF"));
-    }
-    callback();
+  e.read(r, n, t, i, function(s, u) {
+    if (s) return o(s);
+    if (u < t)
+      return o(new Error("unexpected EOF"));
+    o();
   });
 }
-util.inherits(AssertByteCountStream, Transform);
-function AssertByteCountStream(byteCount) {
-  Transform.call(this);
-  this.actualByteCount = 0;
-  this.expectedByteCount = byteCount;
+ue.inherits(Y, nr);
+function Y(e) {
+  nr.call(this), this.actualByteCount = 0, this.expectedByteCount = e;
 }
-AssertByteCountStream.prototype._transform = function(chunk, encoding, cb) {
-  this.actualByteCount += chunk.length;
-  if (this.actualByteCount > this.expectedByteCount) {
-    var msg = "too many bytes in the stream. expected " + this.expectedByteCount + ". got at least " + this.actualByteCount;
-    return cb(new Error(msg));
+Y.prototype._transform = function(e, r, n) {
+  if (this.actualByteCount += e.length, this.actualByteCount > this.expectedByteCount) {
+    var t = "too many bytes in the stream. expected " + this.expectedByteCount + ". got at least " + this.actualByteCount;
+    return n(new Error(t));
   }
-  cb(null, chunk);
+  n(null, e);
 };
-AssertByteCountStream.prototype._flush = function(cb) {
+Y.prototype._flush = function(e) {
   if (this.actualByteCount < this.expectedByteCount) {
-    var msg = "not enough bytes in the stream. expected " + this.expectedByteCount + ". got only " + this.actualByteCount;
-    return cb(new Error(msg));
+    var r = "not enough bytes in the stream. expected " + this.expectedByteCount + ". got only " + this.actualByteCount;
+    return e(new Error(r));
   }
-  cb();
+  e();
 };
-util.inherits(RandomAccessReader, EventEmitter);
-function RandomAccessReader() {
-  EventEmitter.call(this);
-  this.refCount = 0;
+ue.inherits(T, de);
+function T() {
+  de.call(this), this.refCount = 0;
 }
-RandomAccessReader.prototype.ref = function() {
+T.prototype.ref = function() {
   this.refCount += 1;
 };
-RandomAccessReader.prototype.unref = function() {
-  var self = this;
-  self.refCount -= 1;
-  if (self.refCount > 0) return;
-  if (self.refCount < 0) throw new Error("invalid unref");
-  self.close(onCloseDone);
-  function onCloseDone(err) {
-    if (err) return self.emit("error", err);
-    self.emit("close");
+T.prototype.unref = function() {
+  var e = this;
+  if (e.refCount -= 1, e.refCount > 0) return;
+  if (e.refCount < 0) throw new Error("invalid unref");
+  e.close(r);
+  function r(n) {
+    if (n) return e.emit("error", n);
+    e.emit("close");
   }
 };
-RandomAccessReader.prototype.createReadStream = function(options) {
-  var start = options.start;
-  var end = options.end;
-  if (start === end) {
-    var emptyStream = new PassThrough();
-    setImmediate(function() {
-      emptyStream.end();
-    });
-    return emptyStream;
+T.prototype.createReadStream = function(e) {
+  var r = e.start, n = e.end;
+  if (r === n) {
+    var t = new Ie();
+    return setImmediate(function() {
+      t.end();
+    }), t;
   }
-  var stream2 = this._readStreamForRange(start, end);
-  var destroyed = false;
-  var refUnrefFilter = new RefUnrefFilter(this);
-  stream2.on("error", function(err) {
+  var i = this._readStreamForRange(r, n), o = !1, s = new le(this);
+  i.on("error", function(a) {
     setImmediate(function() {
-      if (!destroyed) refUnrefFilter.emit("error", err);
+      o || s.emit("error", a);
     });
-  });
-  refUnrefFilter.destroy = function() {
-    stream2.unpipe(refUnrefFilter);
-    refUnrefFilter.unref();
-    stream2.destroy();
+  }), s.destroy = function() {
+    i.unpipe(s), s.unref(), i.destroy();
   };
-  var byteCounter = new AssertByteCountStream(end - start);
-  refUnrefFilter.on("error", function(err) {
+  var u = new Y(n - r);
+  return s.on("error", function(a) {
     setImmediate(function() {
-      if (!destroyed) byteCounter.emit("error", err);
+      o || u.emit("error", a);
     });
-  });
-  byteCounter.destroy = function() {
-    destroyed = true;
-    refUnrefFilter.unpipe(byteCounter);
-    refUnrefFilter.destroy();
-  };
-  return stream2.pipe(refUnrefFilter).pipe(byteCounter);
+  }), u.destroy = function() {
+    o = !0, s.unpipe(u), s.destroy();
+  }, i.pipe(s).pipe(u);
 };
-RandomAccessReader.prototype._readStreamForRange = function(start, end) {
+T.prototype._readStreamForRange = function(e, r) {
   throw new Error("not implemented");
 };
-RandomAccessReader.prototype.read = function(buffer, offset, length, position, callback) {
-  var readStream = this.createReadStream({ start: position, end: position + length });
-  var writeStream = new Writable();
-  var written = 0;
-  writeStream._write = function(chunk, encoding, cb) {
-    chunk.copy(buffer, offset + written, 0, chunk.length);
-    written += chunk.length;
-    cb();
-  };
-  writeStream.on("finish", callback);
-  readStream.on("error", function(error) {
-    callback(error);
-  });
-  readStream.pipe(writeStream);
+T.prototype.read = function(e, r, n, t, i) {
+  var o = this.createReadStream({ start: t, end: t + n }), s = new rt(), u = 0;
+  s._write = function(a, h, d) {
+    a.copy(e, r + u, 0, a.length), u += a.length, d();
+  }, s.on("finish", i), o.on("error", function(a) {
+    i(a);
+  }), o.pipe(s);
 };
-RandomAccessReader.prototype.close = function(callback) {
-  setImmediate(callback);
+T.prototype.close = function(e) {
+  setImmediate(e);
 };
-util.inherits(RefUnrefFilter, PassThrough);
-function RefUnrefFilter(context) {
-  PassThrough.call(this);
-  this.context = context;
-  this.context.ref();
-  this.unreffedYet = false;
+ue.inherits(le, Ie);
+function le(e) {
+  Ie.call(this), this.context = e, this.context.ref(), this.unreffedYet = !1;
 }
-RefUnrefFilter.prototype._flush = function(cb) {
-  this.unref();
-  cb();
+le.prototype._flush = function(e) {
+  this.unref(), e();
 };
-RefUnrefFilter.prototype.unref = function(cb) {
-  if (this.unreffedYet) return;
-  this.unreffedYet = true;
-  this.context.unref();
+le.prototype.unref = function(e) {
+  this.unreffedYet || (this.unreffedYet = !0, this.context.unref());
 };
-var cp437 = "\0☺☻♥♦♣♠•◘○◙♂♀♪♫☼►◄↕‼¶§▬↨↑↓→←∟↔▲▼ !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~⌂ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜ¢£¥₧ƒáíóúñÑªº¿⌐¬½¼¡«»░▒▓│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀αßΓπΣσµτΦΘΩδ∞φε∩≡±≥≤⌠⌡÷≈°∙·√ⁿ²■ ";
-function decodeBuffer(buffer, start, end, isUtf8) {
-  if (isUtf8) {
-    return buffer.toString("utf8", start, end);
-  } else {
-    var result = "";
-    for (var i = start; i < end; i++) {
-      result += cp437[buffer[i]];
-    }
-    return result;
-  }
+var it = "\0☺☻♥♦♣♠•◘○◙♂♀♪♫☼►◄↕‼¶§▬↨↑↓→←∟↔▲▼ !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~⌂ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜ¢£¥₧ƒáíóúñÑªº¿⌐¬½¼¡«»░▒▓│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀αßΓπΣσµτΦΘΩδ∞φε∩≡±≥≤⌠⌡÷≈°∙·√ⁿ²■ ";
+function ee(e, r, n, t) {
+  if (t)
+    return e.toString("utf8", r, n);
+  for (var i = "", o = r; o < n; o++)
+    i += it[e[o]];
+  return i;
 }
-function readUInt64LE(buffer, offset) {
-  var lower32 = buffer.readUInt32LE(offset);
-  var upper32 = buffer.readUInt32LE(offset + 4);
-  return upper32 * 4294967296 + lower32;
+function j(e, r) {
+  var n = e.readUInt32LE(r), t = e.readUInt32LE(r + 4);
+  return t * 4294967296 + n;
 }
-var newBuffer;
-if (typeof Buffer.allocUnsafe === "function") {
-  newBuffer = function(len) {
-    return Buffer.allocUnsafe(len);
-  };
-} else {
-  newBuffer = function(len) {
-    return new Buffer(len);
-  };
+var S;
+typeof Buffer.allocUnsafe == "function" ? S = function(e) {
+  return Buffer.allocUnsafe(e);
+} : S = function(e) {
+  return new Buffer(e);
+};
+function re(e) {
+  if (e) throw e;
 }
-function defaultCallback(err) {
-  if (err) throw err;
-}
-const debug = srcExports("extract-zip");
-const { createWriteStream, promises: fs } = fs$4;
-const getStream = getStreamExports;
-const path = require$$3;
-const { promisify } = require$$1$1;
-const stream = require$$6;
-const yauzl = yauzl$1;
-const openZip = promisify(yauzl.open);
-const pipeline = promisify(stream.pipeline);
-class Extractor {
-  constructor(zipPath, opts) {
-    this.zipPath = zipPath;
-    this.opts = opts;
+const E = Fr("extract-zip"), { createWriteStream: ot, promises: N } = w, st = Gr, M = mr, { promisify: Le } = V, at = U, ft = I, ct = Le(ft.open), ut = Le(at.pipeline);
+class dt {
+  constructor(r, n) {
+    this.zipPath = r, this.opts = n;
   }
   async extract() {
-    debug("opening", this.zipPath, "with opts", this.opts);
-    this.zipfile = await openZip(this.zipPath, { lazyEntries: true });
-    this.canceled = false;
-    return new Promise((resolve, reject) => {
-      this.zipfile.on("error", (err) => {
-        this.canceled = true;
-        reject(err);
-      });
-      this.zipfile.readEntry();
-      this.zipfile.on("close", () => {
-        if (!this.canceled) {
-          debug("zip extraction complete");
-          resolve();
-        }
-      });
-      this.zipfile.on("entry", async (entry) => {
+    return E("opening", this.zipPath, "with opts", this.opts), this.zipfile = await ct(this.zipPath, { lazyEntries: !0 }), this.canceled = !1, new Promise((r, n) => {
+      this.zipfile.on("error", (t) => {
+        this.canceled = !0, n(t);
+      }), this.zipfile.readEntry(), this.zipfile.on("close", () => {
+        this.canceled || (E("zip extraction complete"), r());
+      }), this.zipfile.on("entry", async (t) => {
         if (this.canceled) {
-          debug("skipping entry", entry.fileName, { cancelled: this.canceled });
+          E("skipping entry", t.fileName, { cancelled: this.canceled });
           return;
         }
-        debug("zipfile entry", entry.fileName);
-        if (entry.fileName.startsWith("__MACOSX/")) {
+        if (E("zipfile entry", t.fileName), t.fileName.startsWith("__MACOSX/")) {
           this.zipfile.readEntry();
           return;
         }
-        const destDir = path.dirname(path.join(this.opts.dir, entry.fileName));
+        const i = M.dirname(M.join(this.opts.dir, t.fileName));
         try {
-          await fs.mkdir(destDir, { recursive: true });
-          const canonicalDestDir = await fs.realpath(destDir);
-          const relativeDestDir = path.relative(this.opts.dir, canonicalDestDir);
-          if (relativeDestDir.split(path.sep).includes("..")) {
-            throw new Error(`Out of bound path "${canonicalDestDir}" found while processing file ${entry.fileName}`);
-          }
-          await this.extractEntry(entry);
-          debug("finished processing", entry.fileName);
-          this.zipfile.readEntry();
-        } catch (err) {
-          this.canceled = true;
-          this.zipfile.close();
-          reject(err);
+          await N.mkdir(i, { recursive: !0 });
+          const o = await N.realpath(i);
+          if (M.relative(this.opts.dir, o).split(M.sep).includes(".."))
+            throw new Error(`Out of bound path "${o}" found while processing file ${t.fileName}`);
+          await this.extractEntry(t), E("finished processing", t.fileName), this.zipfile.readEntry();
+        } catch (o) {
+          this.canceled = !0, this.zipfile.close(), n(o);
         }
       });
     });
   }
-  async extractEntry(entry) {
+  async extractEntry(r) {
     if (this.canceled) {
-      debug("skipping entry extraction", entry.fileName, { cancelled: this.canceled });
+      E("skipping entry extraction", r.fileName, { cancelled: this.canceled });
       return;
     }
-    if (this.opts.onEntry) {
-      this.opts.onEntry(entry, this.zipfile);
-    }
-    const dest = path.join(this.opts.dir, entry.fileName);
-    const mode = entry.externalFileAttributes >> 16 & 65535;
-    const IFMT = 61440;
-    const IFDIR = 16384;
-    const IFLNK = 40960;
-    const symlink = (mode & IFMT) === IFLNK;
-    let isDir = (mode & IFMT) === IFDIR;
-    if (!isDir && entry.fileName.endsWith("/")) {
-      isDir = true;
-    }
-    const madeBy = entry.versionMadeBy >> 8;
-    if (!isDir) isDir = madeBy === 0 && entry.externalFileAttributes === 16;
-    debug("extracting entry", { filename: entry.fileName, isDir, isSymlink: symlink });
-    const procMode = this.getExtractedMode(mode, isDir) & 511;
-    const destDir = isDir ? dest : path.dirname(dest);
-    const mkdirOptions = { recursive: true };
-    if (isDir) {
-      mkdirOptions.mode = procMode;
-    }
-    debug("mkdir", { dir: destDir, ...mkdirOptions });
-    await fs.mkdir(destDir, mkdirOptions);
-    if (isDir) return;
-    debug("opening read stream", dest);
-    const readStream = await promisify(this.zipfile.openReadStream.bind(this.zipfile))(entry);
-    if (symlink) {
-      const link = await getStream(readStream);
-      debug("creating symlink", link, dest);
-      await fs.symlink(link, dest);
-    } else {
-      await pipeline(readStream, createWriteStream(dest, { mode: procMode }));
-    }
+    this.opts.onEntry && this.opts.onEntry(r, this.zipfile);
+    const n = M.join(this.opts.dir, r.fileName), t = r.externalFileAttributes >> 16 & 65535, i = 61440, o = 16384, u = (t & i) === 40960;
+    let a = (t & i) === o;
+    !a && r.fileName.endsWith("/") && (a = !0);
+    const h = r.versionMadeBy >> 8;
+    a || (a = h === 0 && r.externalFileAttributes === 16), E("extracting entry", { filename: r.fileName, isDir: a, isSymlink: u });
+    const d = this.getExtractedMode(t, a) & 511, c = a ? n : M.dirname(n), f = { recursive: !0 };
+    if (a && (f.mode = d), E("mkdir", { dir: c, ...f }), await N.mkdir(c, f), a) return;
+    E("opening read stream", n);
+    const l = await Le(this.zipfile.openReadStream.bind(this.zipfile))(r);
+    if (u) {
+      const m = await st(l);
+      E("creating symlink", m, n), await N.symlink(m, n);
+    } else
+      await ut(l, ot(n, { mode: d }));
   }
-  getExtractedMode(entryMode, isDir) {
-    let mode = entryMode;
-    if (mode === 0) {
-      if (isDir) {
-        if (this.opts.defaultDirMode) {
-          mode = parseInt(this.opts.defaultDirMode, 10);
-        }
-        if (!mode) {
-          mode = 493;
-        }
-      } else {
-        if (this.opts.defaultFileMode) {
-          mode = parseInt(this.opts.defaultFileMode, 10);
-        }
-        if (!mode) {
-          mode = 420;
-        }
-      }
-    }
-    return mode;
+  getExtractedMode(r, n) {
+    let t = r;
+    return t === 0 && (n ? (this.opts.defaultDirMode && (t = parseInt(this.opts.defaultDirMode, 10)), t || (t = 493)) : (this.opts.defaultFileMode && (t = parseInt(this.opts.defaultFileMode, 10)), t || (t = 420))), t;
   }
 }
-var extractZip = async function(zipPath, opts) {
-  debug("creating target directory", opts.dir);
-  if (!path.isAbsolute(opts.dir)) {
+var lt = async function(e, r) {
+  if (E("creating target directory", r.dir), !M.isAbsolute(r.dir))
     throw new Error("Target directory is expected to be absolute");
-  }
-  await fs.mkdir(opts.dir, { recursive: true });
-  opts.dir = await fs.realpath(opts.dir);
-  return new Extractor(zipPath, opts).extract();
+  return await N.mkdir(r.dir, { recursive: !0 }), r.dir = await N.realpath(r.dir), new dt(e, r).extract();
 };
-const extract = /* @__PURE__ */ getDefaultExportFromCjs(extractZip);
-const execPromise = require$$1$1.promisify(exec);
-createRequire(import.meta.url);
-const __dirname = path$1.dirname(fileURLToPath(import.meta.url));
-process.env.APP_ROOT = path$1.join(__dirname, "..");
-const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
-const MAIN_DIST = path$1.join(process.env.APP_ROOT, "dist-electron");
-const RENDERER_DIST = path$1.join(process.env.APP_ROOT, "dist");
-process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path$1.join(process.env.APP_ROOT, "public") : RENDERER_DIST;
-let win;
-function createWindow() {
-  win = new BrowserWindow({
-    icon: path$1.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
-    webPreferences: {
-      preload: path$1.join(__dirname, "preload.mjs")
-    }
-  });
-  win.webContents.on("did-finish-load", () => {
-    win == null ? void 0 : win.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
-  });
-  if (VITE_DEV_SERVER_URL) {
-    win.loadURL(VITE_DEV_SERVER_URL);
-  } else {
-    win.loadFile(path$1.join(RENDERER_DIST, "index.html"));
+const ht = /* @__PURE__ */ yr(lt), je = V.promisify(vr), fr = b.dirname(hr(import.meta.url));
+process.env.APP_ROOT = b.join(fr, "..");
+const be = process.env.VITE_DEV_SERVER_URL, Lt = b.join(process.env.APP_ROOT, "dist-electron"), cr = b.join(process.env.APP_ROOT, "dist");
+process.env.VITE_PUBLIC = be ? b.join(process.env.APP_ROOT, "public") : cr;
+let L;
+const $e = b.join(process.env.APP_ROOT, "projects"), Ue = b.join($.getPath("userData"), "projects");
+if (w.existsSync($e) && !w.existsSync(Ue)) {
+  console.log("🔁 Eski projects klasörü bulundu. Yeni konuma taşınıyor...");
+  try {
+    w.renameSync($e, Ue), console.log("✅ Taşıma tamamlandı.");
+  } catch (e) {
+    console.error("🚨 Taşıma hatası:", e);
   }
 }
-const PROJECTS_DIR = path$1.join(process.env.APP_ROOT || "", "projects");
-if (!fs$4.existsSync(PROJECTS_DIR)) {
-  fs$4.mkdirSync(PROJECTS_DIR);
-}
-ipcMain.handle("create-project", async (_event, projectName) => {
-  try {
-    const projectPath = path$1.join(PROJECTS_DIR, projectName);
-    if (!fs$4.existsSync(projectPath)) {
-      fs$4.mkdirSync(projectPath, { recursive: true });
+function ur() {
+  L = new De({
+    icon: b.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
+    webPreferences: {
+      preload: b.join(fr, "preload.mjs")
     }
-    return { success: true, path: projectPath };
-  } catch (error) {
-    console.error("Error creating project folder:", error);
-    return { success: false, error: error.message };
+  }), L.webContents.openDevTools(), L.webContents.on("did-finish-load", () => {
+    L == null || L.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
+  }), be ? L.loadURL(be) : L.loadFile(b.join(cr, "index.html"));
+}
+const pt = $.getPath("userData"), te = b.join(pt, "projects");
+w.existsSync(te) || w.mkdirSync(te, { recursive: !0 });
+P.handle("create-project", async (e, r) => {
+  try {
+    const n = b.join(te, r);
+    return w.existsSync(n) || w.mkdirSync(n, { recursive: !0 }), { success: !0, path: n };
+  } catch (n) {
+    return console.error("Error creating project folder:", n), { success: !1, error: n.message };
   }
 });
-ipcMain.handle("select-zip-folder", async () => {
+P.handle("select-zip-folder", async () => {
   try {
-    const result = await dialog.showOpenDialog({
+    const e = await lr.showOpenDialog({
       title: "Select Folder Containing ZIPs",
       properties: ["openDirectory"]
     });
-    if (result.canceled || result.filePaths.length === 0) {
-      return { success: false };
-    }
-    return { success: true, folderPath: result.filePaths[0] };
-  } catch (error) {
-    console.error("Error selecting ZIP folder:", error);
-    return { success: false, error: error.message };
+    return e.canceled || e.filePaths.length === 0 ? { success: !1 } : { success: !0, folderPath: e.filePaths[0] };
+  } catch (e) {
+    return console.error("Error selecting ZIP folder:", e), { success: !1, error: e.message };
   }
 });
-ipcMain.handle("process-zip-folder", async (_event, zipFolderPath, projectName) => {
+P.handle("process-zip-folder", async (e, r, n) => {
   try {
-    const projectRoot = path$1.join(PROJECTS_DIR, projectName);
-    if (!fs$4.existsSync(projectRoot)) {
-      fs$4.mkdirSync(projectRoot, { recursive: true });
-    }
-    const zipFiles = fs$4.readdirSync(zipFolderPath).filter((f) => f.endsWith(".zip"));
-    const extractedStudents = [];
-    for (const zipFile of zipFiles) {
-      const zipPath = path$1.join(zipFolderPath, zipFile);
-      const folderName = path$1.basename(zipFile, ".zip");
-      const targetFolder = path$1.join(projectRoot, folderName);
-      if (!fs$4.existsSync(targetFolder)) {
-        fs$4.mkdirSync(targetFolder, { recursive: true });
-      }
-      await extract(zipPath, { dir: targetFolder });
-      extractedStudents.push({
-        studentId: folderName,
-        path: targetFolder
+    const t = b.join(te, n);
+    w.existsSync(t) || w.mkdirSync(t, { recursive: !0 });
+    const i = w.readdirSync(r).filter((s) => s.endsWith(".zip")), o = [];
+    for (const s of i) {
+      const u = b.join(r, s), a = b.basename(s, ".zip"), h = b.join(t, a);
+      w.existsSync(h) || w.mkdirSync(h, { recursive: !0 }), await ht(u, { dir: h }), o.push({
+        studentId: a,
+        path: h
       });
     }
-    return { success: true, students: extractedStudents };
-  } catch (error) {
-    console.error("ZIP processing failed:", error);
-    return { success: false, error: error.message };
+    return { success: !0, students: o };
+  } catch (t) {
+    return console.error("ZIP processing failed:", t), { success: !1, error: t.message };
   }
 });
-ipcMain.handle("evaluate-project", async (_event, project) => {
-  var _a, _b, _c, _d;
+P.handle("evaluate-project", async (e, r) => {
+  var n, t, i, o;
   try {
-    const results = [];
-    const language = (((_a = project.config) == null ? void 0 : _a.language) || "").toLowerCase();
-    const inputArgs = ((_c = (_b = project.config) == null ? void 0 : _b.inputFormat) == null ? void 0 : _c.split(" ")) || [];
-    const expectedOutput = (((_d = project.config) == null ? void 0 : _d.outputFormat) || "").trim();
-    const isWindows = process.platform === "win32";
-    for (const [studentId, studentPath] of Object.entries(project.students || {})) {
+    const s = [], u = (((n = r.config) == null ? void 0 : n.language) || "").toLowerCase(), a = ((i = (t = r.config) == null ? void 0 : t.inputFormat) == null ? void 0 : i.split(" ")) || [], h = (((o = r.config) == null ? void 0 : o.outputFormat) || "").trim(), d = process.platform === "win32";
+    for (const [c, f] of Object.entries(r.students || {}))
       try {
-        let compileCmd = "";
-        let runCmd = "";
-        if (language === "c") {
-          compileCmd = isWindows ? `gcc main.c -o main.exe` : `gcc main.c -o main`;
-          runCmd = isWindows ? `main.exe ${inputArgs.join(" ")}` : `./main ${inputArgs.join(" ")}`;
-        } else if (language === "java") {
-          compileCmd = `javac Main.java`;
-          runCmd = `java Main ${inputArgs.join(" ")}`;
-        } else if (language === "python") {
-          runCmd = `python3 main.py ${inputArgs.join(" ")}`;
-        } else {
-          throw new Error(`Unsupported language: ${language}`);
-        }
-        if (compileCmd) await execPromise(compileCmd, { cwd: studentPath });
-        const { stdout } = await execPromise(runCmd, {
-          cwd: studentPath,
+        let l = "", m = "";
+        if (u === "c")
+          l = d ? "gcc main.c -o main.exe" : "gcc main.c -o main", m = d ? `main.exe ${a.join(" ")}` : `./main ${a.join(" ")}`;
+        else if (u === "java")
+          l = "javac Main.java", m = `java Main ${a.join(" ")}`;
+        else if (u === "python")
+          m = `python3 main.py ${a.join(" ")}`;
+        else
+          throw new Error(`Unsupported language: ${u}`);
+        l && await je(l, { cwd: f });
+        const { stdout: x } = await je(m, {
+          cwd: f,
           timeout: 5e3
+        }), p = x.trim(), v = p === h;
+        s.push({
+          studentId: c,
+          status: v ? "Success" : "Failure",
+          ...v ? {} : { actualOutput: p }
         });
-        const actualOutput = stdout.trim();
-        const isCorrect = actualOutput === expectedOutput;
-        results.push({
-          studentId,
-          status: isCorrect ? "Success" : "Failure",
-          ...isCorrect ? {} : { actualOutput }
-        });
-      } catch (err) {
-        results.push({
-          studentId,
+      } catch (l) {
+        s.push({
+          studentId: c,
           status: "Failure",
-          error: err.message || "Unknown error"
+          error: l.message || "Unknown error"
         });
       }
-    }
-    return { success: true, results };
-  } catch (err) {
-    console.error("Evaluation failed:", err);
-    return { success: false, error: err.message };
+    return { success: !0, results: s };
+  } catch (s) {
+    return console.error("Evaluation failed:", s), { success: !1, error: s.message };
   }
 });
-ipcMain.handle("open-project", async () => {
+P.handle("open-project", async () => {
   console.log("Open Project clicked");
 });
-ipcMain.handle("manage-configurations", async () => {
+P.handle("manage-configurations", async () => {
   console.log("Manage Configurations clicked");
 });
-ipcMain.handle("open-help", async () => {
+P.handle("open-help", async () => {
   console.log("Help clicked");
 });
-app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    app.quit();
-    win = null;
-  }
+$.on("window-all-closed", () => {
+  process.platform !== "darwin" && ($.quit(), L = null);
 });
-app.on("activate", () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
-  }
+$.on("activate", () => {
+  De.getAllWindows().length === 0 && ur();
 });
-app.whenReady().then(createWindow);
+$.whenReady().then(ur);
 export {
-  MAIN_DIST,
-  RENDERER_DIST,
-  VITE_DEV_SERVER_URL
+  Lt as MAIN_DIST,
+  cr as RENDERER_DIST,
+  be as VITE_DEV_SERVER_URL
 };

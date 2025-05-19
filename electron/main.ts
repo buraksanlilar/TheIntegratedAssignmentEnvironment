@@ -1,5 +1,4 @@
 import { app, BrowserWindow, ipcMain, dialog } from 'electron'
-import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import fs from 'fs'
@@ -8,7 +7,6 @@ import { exec } from 'child_process'
 import util from 'util'
 
 const execPromise = util.promisify(exec)
-const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 process.env.APP_ROOT = path.join(__dirname, '..')
@@ -22,8 +20,21 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
   : RENDERER_DIST
 
 let win: BrowserWindow | null
+const oldProjectsDir = path.join(process.env.APP_ROOT!, 'projects')
+const newProjectsDir = path.join(app.getPath('userData'), 'projects')
+
+if (fs.existsSync(oldProjectsDir) && !fs.existsSync(newProjectsDir)) {
+  console.log('🔁 Eski projects klasörü bulundu. Yeni konuma taşınıyor...')
+  try {
+    fs.renameSync(oldProjectsDir, newProjectsDir)
+    console.log('✅ Taşıma tamamlandı.')
+  } catch (err) {
+    console.error('🚨 Taşıma hatası:', err)
+  }
+}
 
 function createWindow() {
+  
   win = new BrowserWindow({
     icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
     webPreferences: {
@@ -43,9 +54,11 @@ function createWindow() {
 }
 
 // 📁 Projects ana klasörü
-const PROJECTS_DIR = path.join(process.env.APP_ROOT || '', 'projects')
+const userDataPath = app.getPath('userData')  // örnek: C:\Users\kadir\AppData\Roaming\iaeproject
+const PROJECTS_DIR = path.join(userDataPath, 'projects')
+
 if (!fs.existsSync(PROJECTS_DIR)) {
-  fs.mkdirSync(PROJECTS_DIR)
+  fs.mkdirSync(PROJECTS_DIR, { recursive: true })
 }
 
 // ✅ Proje oluşturma
