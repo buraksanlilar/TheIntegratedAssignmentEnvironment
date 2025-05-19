@@ -52,7 +52,7 @@ AutoMark_Setup.exe
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/iae.git
+git clone [https://github.com/your-username/iae.git](https://github.com/buraksanlilar/TheIntegratedAssignmentEnvironment)
 cd iae
 
 # Install dependencies
